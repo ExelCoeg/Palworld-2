@@ -1,20 +1,31 @@
 package Game;
 
+import Monsters.Monster;
+import Monsters.MonsterAir;
+import Monsters.MonsterAngin;
+import Monsters.MonsterApi;
+import Monsters.MonsterEs;
+import Monsters.MonsterTanah;
 import java.awt.*;
+import java.io.File;
 import javax.swing.*;
 public class UI {
     private JFrame frame;
     private CardLayout cardLayout;
     private JPanel mainPanel;
-    int width=800, height=600;
+    private Player player = new Player();
+    int width=600    , height=400;  
+    GameState gameState = new GameState();
     public UI(){
         createUI();
     }
+
     public void createUI(){
+        
         frame = new JFrame("Palworld Game");
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
+        frame.setSize(width, height);
         frame.setResizable(false);
 
         cardLayout = new CardLayout();
@@ -22,12 +33,42 @@ public class UI {
 
         mainPanel.add(createMainMenuPanel(), "MainMenu");
         mainPanel.add(createNewGamePanel(), "NewGame");
+        mainPanel.add(createChooseMonsterPanel(), "ChooseMonster");
         mainPanel.add(createHomebasePanel(), "Homebase");
         mainPanel.add(createDungeonPanel(), "Dungeon");
 
         frame.add(mainPanel);
         frame.setVisible(true);
     }
+    private void chooseMonster(int choice) {
+        switch (choice) {
+            case 1 -> player.monsters.add(new MonsterApi("Flameling", 1, 100, 0, Monster.elements.API));
+            case 2 -> player.monsters.add(new MonsterAngin("Zephyrkin", 1, 100, 0, Monster.elements.ANGIN));
+            case 3 -> player.monsters.add(new MonsterAir("Aquabot", 1, 100, 0, Monster.elements.AIR));
+            case 4 -> player.monsters.add(new MonsterEs("Frostlet", 1, 100, 0, Monster.elements.ES));
+            case 5 -> player.monsters.add(new MonsterTanah("Terrapup", 1, 100, 0, Monster.elements.TANAH));
+            default -> JOptionPane.showMessageDialog(frame, "Invalid selection!");
+        }
+        JOptionPane.showMessageDialog(frame, "Selected: " + player.monsters.get(0).getName());
+        cardLayout.show(mainPanel, "Homebase");
+        // Proceed to game loop or further game logic
+    }
+    private JPanel createChooseMonsterPanel(){
+        JPanel panel = new JPanel(new GridLayout(6, 1));
+        JLabel instructions = new JLabel("Select your first monster:", JLabel.CENTER);
+        panel.add(instructions);
+
+        String[] monsters = {"Flameling (API)", "Zephyrkin (ANGIN)", "Aquabot (AIR)", "Frostlet (ES)", "Terrapup (TANAH)"};
+        for (int i = 0; i < monsters.length; i++) {
+            JButton monsterButton = new JButton(monsters[i]);
+            int finalI = i;
+            monsterButton.addActionListener(e -> chooseMonster(finalI + 1));
+            panel.add(monsterButton);
+        }
+
+        return panel;
+    }
+
     private JPanel createMainMenuPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(null); // Use null layout for absolute positioning
@@ -45,13 +86,37 @@ public class UI {
         JButton loadGameButton = new JButton("Load Game");
         loadGameButton.setBounds(270, 220, 100, 50);
         loadGameButton.addActionListener(e -> {
-            // Load game logic here
+            // String[] saves = getSaveFiles();
+            // if (saves.length > 0) {
+            //     String fileName = (String) JOptionPane.showInputDialog(frame, "Pilih file save:", "Load Game",
+            //             JOptionPane.PLAIN_MESSAGE, null, saves, saves[0]);
+            //     if (fileName != null) {
+            //         try {
+            //             currentGameState = SaveAndLoad.loadGame(fileName);
+            //             cardLayout.show(mainPanel, "Homebase");
+            //         } catch (IOException | ClassNotFoundException ex) {
+            //             ex.printStackTrace();
+            //             JOptionPane.showMessageDialog(frame, "Failed to load game.", "Error", JOptionPane.ERROR_MESSAGE);
+            //         }
+            //     }
+            // } else {
+            //     JOptionPane.showMessageDialog(frame, "No save files found.", "Load Game", JOptionPane.INFORMATION_MESSAGE);
+            // }
         });
         panel.add(loadGameButton);
 
         JButton exitButton = new JButton("Exit (Auto Save)");
         exitButton.setBounds(270, 290, 100, 50);
-        exitButton.addActionListener(e -> System.exit(0));
+        exitButton.addActionListener(e -> {
+            // if (currentGameState != null) {
+            //     try {
+            //         SaveAndLoad.saveGame(currentGameState, currentGameState.getPlayerName());
+            //     } catch (IOException ex) {
+            //         ex.printStackTrace();
+            //     }
+            // }
+            System.exit(0);
+        });
         panel.add(exitButton);
 
         return panel;
@@ -78,7 +143,7 @@ public class UI {
             } else {
                 JOptionPane.showMessageDialog(frame, "Nama tidak boleh kosong!");
             }
-
+            // cardLayout.show(mainPanel, "ChooseMonster");
         });
 
         panel.add(namePanel, BorderLayout.CENTER);
@@ -89,7 +154,8 @@ public class UI {
 
     private JPanel createHomebasePanel() {
         JPanel panel = new JPanel(new GridLayout(5, 1));
-        JLabel homebaseLabel = new JLabel("Selamat datang di Homebase!", JLabel.CENTER);
+        JLabel homebaseLabel = new JLabel(("Selamat datang di Homebase! " + player.getName()), JLabel.CENTER);
+        // System.out.println("Selamat datang " + player.getName());
         panel.add(homebaseLabel);
 
         JButton healButton = new JButton("Heal Monster");
@@ -132,6 +198,19 @@ public class UI {
 
         return panel;
     }
+    
+        private String[] getSaveFiles() {
+        File dir = new File(System.getProperty("user.dir"));
+        File[] files = dir.listFiles((d, name) -> name.endsWith(".txt"));
+        String[] saveFiles = new String[files.length];
+        for (int i = 0; i < files.length; i++) {
+            saveFiles[i] = files[i].getName();
+        }
+        return saveFiles;
+    }
 
-
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(UI::new);
+        
+    }
 }
