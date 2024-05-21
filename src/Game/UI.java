@@ -1,29 +1,30 @@
 package Game;
 
-import Monsters.Monster;
-import Monsters.MonsterAir;
-import Monsters.MonsterAngin;
-import Monsters.MonsterApi;
-import Monsters.MonsterEs;
-import Monsters.MonsterTanah;
+import Monsters.*;
 import java.awt.*;
-import java.io.File;
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+
 public class UI {
     private JFrame frame;
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private Player player = new Player();
-    int width=600    , height=400;  
-    GameState gameState = new GameState();
-    public UI(){
+    private JTextArea dungeonInfo;
+    private Monster monsterDipilih;
+    private Monster monsterLawan;
+
+    int width = 600, height = 400;
+
+    public UI() {
         createUI();
     }
 
-    public void createUI(){
-        
+    public void createUI() {
         frame = new JFrame("Palworld Game");
-        
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(width, height);
         frame.setResizable(false);
@@ -40,6 +41,7 @@ public class UI {
         frame.add(mainPanel);
         frame.setVisible(true);
     }
+
     private void chooseMonster(int choice) {
         switch (choice) {
             case 1 -> player.monsters.add(new MonsterApi("Flameling", 1, 100, 0, Monster.elements.API));
@@ -51,9 +53,9 @@ public class UI {
         }
         JOptionPane.showMessageDialog(frame, "Selected: " + player.monsters.get(0).getName());
         cardLayout.show(mainPanel, "Homebase");
-        // Proceed to game loop or further game logic
     }
-    private JPanel createChooseMonsterPanel(){
+
+    private JPanel createChooseMonsterPanel() {
         JPanel panel = new JPanel(new GridLayout(6, 1));
         JLabel instructions = new JLabel("Select your first monster:", JLabel.CENTER);
         panel.add(instructions);
@@ -86,35 +88,14 @@ public class UI {
         JButton loadGameButton = new JButton("Load Game");
         loadGameButton.setBounds(270, 220, 100, 50);
         loadGameButton.addActionListener(e -> {
-            // String[] saves = getSaveFiles();
-            // if (saves.length > 0) {
-            //     String fileName = (String) JOptionPane.showInputDialog(frame, "Pilih file save:", "Load Game",
-            //             JOptionPane.PLAIN_MESSAGE, null, saves, saves[0]);
-            //     if (fileName != null) {
-            //         try {
-            //             currentGameState = SaveAndLoad.loadGame(fileName);
-            //             cardLayout.show(mainPanel, "Homebase");
-            //         } catch (IOException | ClassNotFoundException ex) {
-            //             ex.printStackTrace();
-            //             JOptionPane.showMessageDialog(frame, "Failed to load game.", "Error", JOptionPane.ERROR_MESSAGE);
-            //         }
-            //     }
-            // } else {
-            //     JOptionPane.showMessageDialog(frame, "No save files found.", "Load Game", JOptionPane.INFORMATION_MESSAGE);
-            // }
+            // Load game logic here
         });
         panel.add(loadGameButton);
 
         JButton exitButton = new JButton("Exit (Auto Save)");
         exitButton.setBounds(270, 290, 100, 50);
         exitButton.addActionListener(e -> {
-            // if (currentGameState != null) {
-            //     try {
-            //         SaveAndLoad.saveGame(currentGameState, currentGameState.getPlayerName());
-            //     } catch (IOException ex) {
-            //         ex.printStackTrace();
-            //     }
-            // }
+            // Save game logic here
             System.exit(0);
         });
         panel.add(exitButton);
@@ -126,8 +107,7 @@ public class UI {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel nameLabel = new JLabel("Masukkan nama player: ", JLabel.CENTER);
         JTextField nameField = new JTextField();
-        nameField.setPreferredSize(new Dimension(200,35));
-        
+        nameField.setPreferredSize(new Dimension(200, 35));
 
         JPanel namePanel = new JPanel();
         namePanel.add(nameLabel);
@@ -135,7 +115,6 @@ public class UI {
 
         JButton startButton = new JButton("Mulai");
         startButton.addActionListener(e -> {
-
             String playerName = nameField.getText();
             if (!playerName.isEmpty()) {
                 player.setName(playerName);
@@ -143,7 +122,6 @@ public class UI {
             } else {
                 JOptionPane.showMessageDialog(frame, "Nama tidak boleh kosong!");
             }
-            // cardLayout.show(mainPanel, "ChooseMonster");
         });
 
         panel.add(namePanel, BorderLayout.CENTER);
@@ -155,7 +133,6 @@ public class UI {
     private JPanel createHomebasePanel() {
         JPanel panel = new JPanel(new GridLayout(5, 1));
         JLabel homebaseLabel = new JLabel(("Selamat datang di Homebase! " + player.getName()), JLabel.CENTER);
-        // System.out.println("Selamat datang " + player.getName());
         panel.add(homebaseLabel);
 
         JButton healButton = new JButton("Heal Monster");
@@ -187,30 +164,101 @@ public class UI {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel dungeonLabel = new JLabel("Selamat datang di Dungeon!", JLabel.CENTER);
         panel.add(dungeonLabel, BorderLayout.NORTH);
-
-        JTextArea dungeonInfo = new JTextArea();
+    
+        dungeonInfo = new JTextArea();
         dungeonInfo.setEditable(false);
         panel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
-
-        JButton backButton = new JButton("Kembali ke Homebase");
+    
+        JPanel actionPanel = new JPanel(new GridLayout(1, 3));
+    
+        JButton basicAttackButton = new JButton("Basic Attack");
+        basicAttackButton.addActionListener(e -> playerAction(1));
+        actionPanel.add(basicAttackButton);
+    
+        JButton specialAttackButton = new JButton("Special Attack");
+        specialAttackButton.addActionListener(e -> playerAction(2));
+        actionPanel.add(specialAttackButton);
+    
+        JButton elementalAttackButton = new JButton("Elemental Attack");
+        elementalAttackButton.addActionListener(e -> playerAction(3));
+        actionPanel.add(elementalAttackButton);
+    
+        // Create a new container panel for actionPanel and escape panel
+        JPanel containerPanel = new JPanel(new BorderLayout());
+        containerPanel.add(actionPanel, BorderLayout.NORTH);
+    
+        // Create escape panel with Back to Base button
+        JPanel escapePanel = new JPanel();
+        JButton backButton = new JButton("Back to Base");
         backButton.addActionListener(e -> cardLayout.show(mainPanel, "Homebase"));
-        panel.add(backButton, BorderLayout.SOUTH);
-
+        escapePanel.add(backButton);
+    
+        containerPanel.add(escapePanel, BorderLayout.SOUTH);
+    
+        panel.add(containerPanel, BorderLayout.SOUTH);
+    
         return panel;
     }
     
-        private String[] getSaveFiles() {
-        File dir = new File(System.getProperty("user.dir"));
-        File[] files = dir.listFiles((d, name) -> name.endsWith(".txt"));
-        String[] saveFiles = new String[files.length];
-        for (int i = 0; i < files.length; i++) {
-            saveFiles[i] = files[i].getName();
+
+    private void playerAction(int action) {
+        if (monsterDipilih == null || monsterLawan == null) {
+            monsterDipilih = player.monsters.get(0); // Select your monster
+            monsterLawan = new MonsterTanah("TanahMonster", 1, 100, 0, Monster.elements.TANAH); // Example opponent
         }
-        return saveFiles;
+
+        switch (action) {
+            case 1 -> {
+                monsterDipilih.BasicAttack(monsterLawan);
+                dungeonInfo.append("Monster " + monsterDipilih.getName() + " menyerang " + monsterLawan.getName() + " dengan Basic Attack\n");
+            }
+            case 2 -> {
+                monsterDipilih.SpecialAttack(monsterLawan);
+                dungeonInfo.append("Monster " + monsterDipilih.getName() + " menyerang " + monsterLawan.getName() + " dengan Special Attack\n");
+            }
+            case 3 -> {
+                if (monsterDipilih instanceof ElementalMonster elementalMonster) {
+                    elementalMonster.ElementalAttack(monsterLawan);
+                    dungeonInfo.append("Monster " + monsterDipilih.getName() + " menyerang " + monsterLawan.getName() + " dengan Elemental Attack\n");
+                } else {
+                    dungeonInfo.append("Monster tidak memiliki serangan elemen\n");
+                }
+            }
+            default -> dungeonInfo.append("Pilihan tidak valid!\n");
+        }
+
+        enemyAction();
+
+        if (monsterDipilih.getHp() <= 0) {
+            dungeonInfo.append("Monster Anda pingsan!\n");
+        } else if (monsterLawan.getHp() <= 0) {
+            monsterDipilih.setExp(monsterLawan.getLevel() * 10);
+            dungeonInfo.append("Monster lawan pingsan!\n");
+            dungeonInfo.append("Anda mendapatkan " + monsterLawan.getLevel() * 10 + " exp!\n");
+        }
+    }
+
+    private void enemyAction() {
+        int aksiMonsterLawan = new Random().nextInt(2);
+        switch (aksiMonsterLawan) {
+            case 0 -> {
+                monsterLawan.BasicAttack(monsterDipilih);
+                dungeonInfo.append("Monster " + monsterLawan.getName() + " menyerang " + monsterDipilih.getName() + " dengan Basic Attack\n");
+            }
+            case 1 -> {
+                monsterLawan.SpecialAttack(monsterDipilih);
+                dungeonInfo.append("Monster " + monsterLawan.getName() + " menyerang " + monsterDipilih.getName() + " dengan Special Attack\n");
+            }
+            case 2 -> {
+                if (monsterLawan instanceof ElementalMonster elementalMonster) {
+                    elementalMonster.ElementalAttack(monsterDipilih);
+                    dungeonInfo.append("Monster " + monsterLawan.getName() + " menyerang " + monsterDipilih.getName() + " dengan Elemental Attack\n");
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(UI::new);
-        
+        new UI();
     }
 }
