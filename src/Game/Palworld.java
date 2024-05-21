@@ -62,8 +62,7 @@ public class Palworld {
     }
     public static void main(String[] args) {
         new UI();
-    //     Scanner sc = new Scanner(System.in);
-    //     Player player = new Player();
+        //     Scanner sc = new Scanner(System.in);
     //     int pilihMenu = PilihMenu();
     //     while(pilihMenu < 1 || pilihMenu > 3){
     //         System.out.println("Pilihan tidak valid!");

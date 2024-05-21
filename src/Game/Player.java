@@ -2,8 +2,8 @@ package Game;
 import Monsters.*;
 import java.util.*;
 public class Player {
-    private String name;
-    public List<Monster> monsters;
+    private String name = null;
+    public List<Monster> monsters = new ArrayList<>();
 
     public Player(String name){
        this.name = name;
@@ -16,9 +16,10 @@ public class Player {
         return this.name;
     }
     public void setName(String name){
-        this.name = name;
+       this.name = name;
     }
     public Player(){
+        
     }
 
     public void PrintMonsters(){
@@ -34,8 +35,6 @@ public class Player {
         System.out.println();
     }
    
-    public static void main(String[] args) {
-        System.out.println("hi");
-    }
+   
     
 }
