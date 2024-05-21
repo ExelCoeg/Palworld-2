@@ -61,7 +61,7 @@ public class Palworld {
         return monsterMap;
     }
     public static void main(String[] args) {
-        new UI();
+        
         //     Scanner sc = new Scanner(System.in);
     //     int pilihMenu = PilihMenu();
     //     while(pilihMenu < 1 || pilihMenu > 3){

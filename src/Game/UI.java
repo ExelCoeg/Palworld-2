@@ -15,7 +15,6 @@ public class UI {
     private JPanel mainPanel;
     private Player player = new Player();
     int width=600    , height=400;  
-    GameState gameState = new GameState();
     public UI(){
         createUI();
     }
@@ -33,8 +32,8 @@ public class UI {
 
         mainPanel.add(createMainMenuPanel(), "MainMenu");
         mainPanel.add(createNewGamePanel(), "NewGame");
+        
         mainPanel.add(createChooseMonsterPanel(), "ChooseMonster");
-        mainPanel.add(createHomebasePanel(), "Homebase");
         mainPanel.add(createDungeonPanel(), "Dungeon");
 
         frame.add(mainPanel);
@@ -54,6 +53,7 @@ public class UI {
         // Proceed to game loop or further game logic
     }
     private JPanel createChooseMonsterPanel(){
+        
         JPanel panel = new JPanel(new GridLayout(6, 1));
         JLabel instructions = new JLabel("Select your first monster:", JLabel.CENTER);
         panel.add(instructions);
@@ -65,6 +65,7 @@ public class UI {
             monsterButton.addActionListener(e -> chooseMonster(finalI + 1));
             panel.add(monsterButton);
         }
+
 
         return panel;
     }
@@ -138,12 +139,13 @@ public class UI {
 
             String playerName = nameField.getText();
             if (!playerName.isEmpty()) {
-                player.setName(playerName);
-                cardLayout.show(mainPanel, "Homebase");
+                player.setName(playerName); 
+                mainPanel.add(createHomebasePanel(), "Homebase");
+                // System.out.println("Selamat datang " + player.getName()); masih sana sana a
             } else {
                 JOptionPane.showMessageDialog(frame, "Nama tidak boleh kosong!");
             }
-            // cardLayout.show(mainPanel, "ChooseMonster");
+            cardLayout.show(mainPanel, "ChooseMonster");
         });
 
         panel.add(namePanel, BorderLayout.CENTER);
@@ -211,6 +213,6 @@ public class UI {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(UI::new);
-        
+        // new UI();
     }
 }
