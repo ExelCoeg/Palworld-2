@@ -15,6 +15,8 @@ public class UI {
     private JTextArea dungeonInfo;
     private JLabel playerMonsterHpLabel;
     private JLabel enemyMonsterHpLabel;
+    private JLabel playerActionLabel;
+    private JLabel enemyActionLabel;
     private Monster monsterDipilih;
     private Monster monsterLawan;
 
@@ -190,48 +192,49 @@ public class UI {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel dungeonLabel = new JLabel("Selamat datang di Dungeon!", JLabel.CENTER);
         panel.add(dungeonLabel, BorderLayout.NORTH);
-
+    
         dungeonInfo = new JTextArea();
         dungeonInfo.setEditable(false);
         panel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
-
-        JPanel statusPanel = new JPanel(new GridLayout(1, 2));
-        playerMonsterHpLabel = new JLabel("Player HP: 0", JLabel.CENTER);
-        enemyMonsterHpLabel = new JLabel("Enemy HP: 0", JLabel.CENTER);
+    
+        JPanel statusPanel = new JPanel(new GridLayout(3, 1));
+        playerMonsterHpLabel = new JLabel("Player HP: 100", JLabel.CENTER);
+        enemyMonsterHpLabel = new JLabel("Enemy HP: 100", JLabel.CENTER);
+        playerActionLabel = new JLabel("Player Action: ", JLabel.CENTER); // Make sure to assign to class variable
+        enemyActionLabel = new JLabel("Enemy Action: ", JLabel.CENTER); // Make sure to assign to class variable
         statusPanel.add(playerMonsterHpLabel);
         statusPanel.add(enemyMonsterHpLabel);
+        statusPanel.add(playerActionLabel); // Add to status panel
+        statusPanel.add(enemyActionLabel); // Add to status panel
+        
         panel.add(statusPanel, BorderLayout.SOUTH);
-
+    
         JPanel actionPanel = new JPanel(new GridLayout(1, 3));
-
-        JButton basicAttackButton = new JButton("Basic Attack");
+    
+        JButton basicAttackButton = new JButton("Basic Attack"); // Set text for basic attack button
         basicAttackButton.addActionListener(e -> playerAction(1));
         actionPanel.add(basicAttackButton);
-
-        JButton specialAttackButton = new JButton("Special Attack");
+    
+        JButton specialAttackButton = new JButton("Special Attack"); // Set text for special attack button
         specialAttackButton.addActionListener(e -> playerAction(2));
         actionPanel.add(specialAttackButton);
-
-        JButton elementalAttackButton = new JButton("Elemental Attack");
+    
+        JButton elementalAttackButton = new JButton("Elemental Attack"); // Set text for elemental attack button
         elementalAttackButton.addActionListener(e -> playerAction(3));
         actionPanel.add(elementalAttackButton);
-
-        // JButton changeMonsterButton = new JButton("Change Monster");
-        // changeMonsterButton.addActionListener(e -> cardLayout.show(mainPanel, "ManageMonsters"));
-        // actionPanel.add(changeMonsterButton);
-
+    
         JPanel containerPanel = new JPanel(new BorderLayout());
         containerPanel.add(actionPanel, BorderLayout.NORTH);
-
+    
         JPanel escapePanel = new JPanel();
         JButton backButton = new JButton("Back to Base");
         backButton.addActionListener(e -> cardLayout.show(mainPanel, "Homebase"));
         escapePanel.add(backButton);
-
+    
         containerPanel.add(escapePanel, BorderLayout.SOUTH);
-
+    
         panel.add(containerPanel, BorderLayout.CENTER);
-
+    
         return panel;
     }
 
@@ -268,7 +271,7 @@ public class UI {
             monsterDipilih = player.monsters.get(0); // Select your monster
             monsterLawan = new MonsterTanah("TanahMonster", 1, 100, 0, Monster.elements.TANAH); // Example opponent
         }
-
+    
         switch (action) {
             case 1 -> {
                 monsterDipilih.BasicAttack(monsterLawan);
@@ -288,23 +291,28 @@ public class UI {
             }
             default -> dungeonInfo.append("Pilihan tidak valid!\n");
         }
-
+    
         updateHpLabels();
-        enemyAction();
-        updateHpLabels();
-
+        int randomAction = new Random().nextInt(3); // Generate a random number  for action
+        enemyAction(randomAction); // Pass the randomly generated action to enemyAction method
+        
+        updateHpLabels(); // Update HP labels again after enemy's action
+    
         if (monsterDipilih.getHp() <= 0) {
             dungeonInfo.append("Monster Anda pingsan!\n");
+            cardLayout.show(mainPanel,"Homebase");
         } else if (monsterLawan.getHp() <= 0) {
             monsterDipilih.setExp(monsterDipilih.getExp() + monsterLawan.getLevel() * 10);
             dungeonInfo.append("Monster lawan pingsan!\n");
             dungeonInfo.append("Anda mendapatkan " + monsterLawan.getLevel() * 10 + " exp!\n");
+            cardLayout.show(mainPanel,"Homebase");
         }
+        String actionString = getActionString(action);
+        updateActionLabels(actionString, "");
     }
 
-    private void enemyAction() {
-        int aksiMonsterLawan = new Random().nextInt(3); // Corrected to 3 for all actions
-        switch (aksiMonsterLawan) {
+    private void enemyAction(int action) {
+        switch (action) {
             case 0 -> {
                 monsterLawan.BasicAttack(monsterDipilih);
                 dungeonInfo.append("Monster " + monsterLawan.getName() + " menyerang " + monsterDipilih.getName() + " dengan Basic Attack\n");
@@ -320,11 +328,33 @@ public class UI {
                 }
             }
         }
+    
+        updateHpLabels(); // Update HP labels after enemy's action
+        String actionString = getActionString(action); // Get the action string
+        updateActionLabels("", actionString);
+    }
+    
+    private String getActionString(int action) {
+        switch (action) {
+            case 1:
+                return "Basic Attack";
+            case 2:
+                return "Special Attack";
+            case 3:
+                return "Elemental Attack";
+            default:
+                return "Invalid Action";
+        }
     }
 
     private void updateHpLabels() {
         playerMonsterHpLabel.setText("Player HP: " + monsterDipilih.getHp());
         enemyMonsterHpLabel.setText("Enemy HP: " + monsterLawan.getHp());
+    }
+
+    private void updateActionLabels(String playerAction, String enemyAction) {
+        playerActionLabel.setText("Player Action: " + playerAction);
+        enemyActionLabel.setText("Enemy Action: " + enemyAction);
     }
 
     public static void main(String[] args) {
