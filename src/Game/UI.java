@@ -13,6 +13,8 @@ public class UI {
     private JPanel mainPanel;
     private Player player = new Player();
     private JTextArea dungeonInfo;
+    private JLabel playerMonsterHpLabel;
+    private JLabel enemyMonsterHpLabel;
     private Monster monsterDipilih;
     private Monster monsterLawan;
 
@@ -37,6 +39,7 @@ public class UI {
         mainPanel.add(createChooseMonsterPanel(), "ChooseMonster");
         mainPanel.add(createHomebasePanel(), "Homebase");
         mainPanel.add(createDungeonPanel(), "Dungeon");
+        mainPanel.add(createManageMonstersPanel(), "ManageMonsters");
 
         frame.add(mainPanel);
         frame.setVisible(true);
@@ -118,7 +121,7 @@ public class UI {
             String playerName = nameField.getText();
             if (!playerName.isEmpty()) {
                 player.setName(playerName);
-                cardLayout.show(mainPanel, "Homebase");
+                cardLayout.show(mainPanel, "ChooseMonster");
             } else {
                 JOptionPane.showMessageDialog(frame, "Nama tidak boleh kosong!");
             }
@@ -131,19 +134,38 @@ public class UI {
     }
 
     private JPanel createHomebasePanel() {
-        JPanel panel = new JPanel(new GridLayout(5, 1));
+        JPanel panel = new JPanel(new GridLayout(6, 1));
         JLabel homebaseLabel = new JLabel(("Selamat datang di Homebase! " + player.getName()), JLabel.CENTER);
         panel.add(homebaseLabel);
 
         JButton healButton = new JButton("Heal Monster");
         healButton.addActionListener(e -> {
-            // Heal monster logic here
+            for (Monster monster : player.monsters) {
+                monster.Heal();
+            }
+            JOptionPane.showMessageDialog(frame, "All monsters healed!");
         });
         panel.add(healButton);
 
         JButton evolveButton = new JButton("Evolve Monster");
         evolveButton.addActionListener(e -> {
-            // Evolve monster logic here
+            for (Monster monster : player.monsters) {
+                if (!monster.evolved) {
+                    String newElement = JOptionPane.showInputDialog(frame, "Enter new element for " + monster.getName() + ":");
+                    if (newElement != null) {
+                        Monster evolvedMonster = monster.Evolve(newElement);
+                        if (evolvedMonster != null) {
+                            player.monsters.remove(monster);
+                            player.monsters.add(evolvedMonster);
+                            JOptionPane.showMessageDialog(frame, "Monster evolved to " + evolvedMonster.getName());
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "Evolution failed!");
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, monster.getName() + " cannot evolve anymore.");
+                }
+            }
         });
         panel.add(evolveButton);
 
@@ -157,6 +179,10 @@ public class UI {
         dungeonButton.addActionListener(e -> cardLayout.show(mainPanel, "Dungeon"));
         panel.add(dungeonButton);
 
+        JButton manageMonstersButton = new JButton("Manage Monsters");
+        manageMonstersButton.addActionListener(e -> cardLayout.show(mainPanel, "ManageMonsters"));
+        panel.add(manageMonstersButton);
+
         return panel;
     }
 
@@ -164,42 +190,78 @@ public class UI {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel dungeonLabel = new JLabel("Selamat datang di Dungeon!", JLabel.CENTER);
         panel.add(dungeonLabel, BorderLayout.NORTH);
-    
+
         dungeonInfo = new JTextArea();
         dungeonInfo.setEditable(false);
         panel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
-    
+
+        JPanel statusPanel = new JPanel(new GridLayout(1, 2));
+        playerMonsterHpLabel = new JLabel("Player HP: 0", JLabel.CENTER);
+        enemyMonsterHpLabel = new JLabel("Enemy HP: 0", JLabel.CENTER);
+        statusPanel.add(playerMonsterHpLabel);
+        statusPanel.add(enemyMonsterHpLabel);
+        panel.add(statusPanel, BorderLayout.SOUTH);
+
         JPanel actionPanel = new JPanel(new GridLayout(1, 3));
-    
+
         JButton basicAttackButton = new JButton("Basic Attack");
         basicAttackButton.addActionListener(e -> playerAction(1));
         actionPanel.add(basicAttackButton);
-    
+
         JButton specialAttackButton = new JButton("Special Attack");
         specialAttackButton.addActionListener(e -> playerAction(2));
         actionPanel.add(specialAttackButton);
-    
+
         JButton elementalAttackButton = new JButton("Elemental Attack");
         elementalAttackButton.addActionListener(e -> playerAction(3));
         actionPanel.add(elementalAttackButton);
-    
-        // Create a new container panel for actionPanel and escape panel
+
+        // JButton changeMonsterButton = new JButton("Change Monster");
+        // changeMonsterButton.addActionListener(e -> cardLayout.show(mainPanel, "ManageMonsters"));
+        // actionPanel.add(changeMonsterButton);
+
         JPanel containerPanel = new JPanel(new BorderLayout());
         containerPanel.add(actionPanel, BorderLayout.NORTH);
-    
-        // Create escape panel with Back to Base button
+
         JPanel escapePanel = new JPanel();
         JButton backButton = new JButton("Back to Base");
         backButton.addActionListener(e -> cardLayout.show(mainPanel, "Homebase"));
         escapePanel.add(backButton);
-    
+
         containerPanel.add(escapePanel, BorderLayout.SOUTH);
-    
-        panel.add(containerPanel, BorderLayout.SOUTH);
-    
+
+        panel.add(containerPanel, BorderLayout.CENTER);
+
         return panel;
     }
-    
+
+    private JPanel createManageMonstersPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel label = new JLabel("Manage Your Monsters", JLabel.CENTER);
+        panel.add(label, BorderLayout.NORTH);
+
+        JPanel monstersPanel = new JPanel(new GridLayout(player.monsters.size(), 1));
+
+        for (int i = 0; i < player.monsters.size(); i++) {
+            Monster monster = player.monsters.get(i);
+            JButton monsterButton = new JButton(monster.getName() + " (HP: " + monster.getHp() + ")");
+            int finalI = i;
+            monsterButton.addActionListener(e -> {
+                monsterDipilih = player.monsters.get(finalI);
+                JOptionPane.showMessageDialog(frame, "Selected: " + monsterDipilih.getName());
+                cardLayout.show(mainPanel, "Dungeon");
+            });
+            monstersPanel.add(monsterButton);
+        }
+
+        panel.add(new JScrollPane(monstersPanel), BorderLayout.CENTER);
+
+        JButton backButton = new JButton("Back to Base");
+        backButton.addActionListener(e -> cardLayout.show(mainPanel, "Homebase"));
+        panel.add(backButton, BorderLayout.SOUTH);
+
+        return panel;
+    }
 
     private void playerAction(int action) {
         if (monsterDipilih == null || monsterLawan == null) {
@@ -227,19 +289,21 @@ public class UI {
             default -> dungeonInfo.append("Pilihan tidak valid!\n");
         }
 
+        updateHpLabels();
         enemyAction();
+        updateHpLabels();
 
         if (monsterDipilih.getHp() <= 0) {
             dungeonInfo.append("Monster Anda pingsan!\n");
         } else if (monsterLawan.getHp() <= 0) {
-            monsterDipilih.setExp(monsterLawan.getLevel() * 10);
+            monsterDipilih.setExp(monsterDipilih.getExp() + monsterLawan.getLevel() * 10);
             dungeonInfo.append("Monster lawan pingsan!\n");
             dungeonInfo.append("Anda mendapatkan " + monsterLawan.getLevel() * 10 + " exp!\n");
         }
     }
 
     private void enemyAction() {
-        int aksiMonsterLawan = new Random().nextInt(2);
+        int aksiMonsterLawan = new Random().nextInt(3); // Corrected to 3 for all actions
         switch (aksiMonsterLawan) {
             case 0 -> {
                 monsterLawan.BasicAttack(monsterDipilih);
@@ -256,6 +320,11 @@ public class UI {
                 }
             }
         }
+    }
+
+    private void updateHpLabels() {
+        playerMonsterHpLabel.setText("Player HP: " + monsterDipilih.getHp());
+        enemyMonsterHpLabel.setText("Enemy HP: " + monsterLawan.getHp());
     }
 
     public static void main(String[] args) {
