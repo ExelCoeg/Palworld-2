@@ -4,7 +4,7 @@ import java.util.*;
 public class Player {
     private String name = null;
     public List<Monster> monsters = new ArrayList<>();
-
+    public List<Monster> selectedMonsters = new ArrayList<>();
     public Player(String name){
        this.name = name;
     }
