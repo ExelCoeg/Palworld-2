@@ -1,14 +1,12 @@
 package Game;
 
 import Monsters.*;
+import Monsters.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 public class UI {
     private JFrame frame;
     private CardLayout cardLayout;
@@ -47,8 +45,10 @@ public class UI {
 
         mainPanel.add(createMainMenuPanel(), "MainMenu");
         mainPanel.add(createNewGamePanel(), "NewGame");
-        mainPanel.add(createChooseStartingMonsterPanel(), "ChooseMonster");
+        mainPanel.add(createChooseMonsterPanel(), "ChooseMonster");
         mainPanel.add(createDungeonPanel(), "Dungeon");
+        mainPanel.add(createManageMonstersPanel(), "ManageMonsters");
+        mainPanel.add(BuyPotion(), "BuyItem");
 
         frame.add(mainPanel);
         frame.setVisible(true);
@@ -105,15 +105,15 @@ public class UI {
             public void actionPerformed(ActionEvent e) {
                 elapsedTime++;
                 stopwatchLabel.setText("Waktu: " + elapsedTime + " detik");
-                if (new Random().nextInt(10) < 2) { 
+                if (new Random().nextInt(10) < 2) {
                     encounterMonster();
                 } else {
-                  
                     String movementText = getRandomMovementText();
                     dungeonInfo.append(movementText + "\n");
-                }
-            }
-        });
+                }}});
+          
+    
+        
         adventureTimer.start();
     }
     
@@ -221,8 +221,7 @@ public class UI {
         JOptionPane.showMessageDialog(frame, "Selected: " + player.monsters.get(0).getName());
         cardLayout.show(mainPanel, "Homebase");
     }
-
-    private JPanel createChooseStartingMonsterPanel() {
+    private JPanel createChooseMonsterPanel(){
         JPanel panel = new JPanel(new GridLayout(6, 1));
         JLabel instructions = new JLabel("Select your first monster:", JLabel.CENTER);
         panel.add(instructions);
@@ -342,9 +341,8 @@ public class UI {
         panel.add(evolveButton);
     
         JButton buyItemButton = new JButton("Beli Item");
-        buyItemButton.addActionListener(e -> {
-            // Buy item logic here
-        });
+        // mainPanel.add(BuyPotion(), "BuyItem");
+        buyItemButton.addActionListener(e -> cardLayout.show(mainPanel, "BuyItem")); // Switch to the BuyPotion panel
         panel.add(buyItemButton);
     
         JButton dungeonButton = new JButton("Keluar Homebase");
@@ -357,6 +355,51 @@ public class UI {
         panel.add(manageMonstersButton);
     
     
+        return panel;
+    }
+    private JPanel BuyPotion() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JLabel title = new JLabel("Welcome to the Potion Shop!", JLabel.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        panel.add(title, BorderLayout.NORTH);
+
+        JPanel potionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+
+        JButton healthPotionButton = new JButton("Buy Health Potion");
+        JButton damagePotionButton = new JButton("Buy Damage Potion");
+
+        JLabel healthPotionLabel = new JLabel("Price: 50 Gold");
+        JLabel damagePotionLabel = new JLabel("Price: 75 Gold");
+
+        potionPanel.add(healthPotionLabel);
+        potionPanel.add(healthPotionButton);
+        potionPanel.add(damagePotionLabel);
+        potionPanel.add(damagePotionButton);
+
+        panel.add(potionPanel, BorderLayout.CENTER);
+
+        JTextArea outputArea = new JTextArea(5, 20);
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        panel.add(scrollPane, BorderLayout.SOUTH);
+
+        // Action listeners for the buttons
+        healthPotionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                outputArea.append("Health Potion bought for 50 Gold.\n");
+            }
+        });
+
+        damagePotionButton.addActionListener(new ActionListener() {
+            @Override
+
+            public void actionPerformed(ActionEvent e) {
+                outputArea.append("Damage Potion bought for 75 Gold.\n");
+            }
+        });
+
         return panel;
     }
 
@@ -665,5 +708,6 @@ public class UI {
    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(UI::new);
+        
     }
 }
