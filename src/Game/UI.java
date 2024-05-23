@@ -44,7 +44,7 @@ public class UI {
 
         mainPanel.add(createMainMenuPanel(), "MainMenu");
         mainPanel.add(createNewGamePanel(), "NewGame");
-        mainPanel.add(createChooseStartingMonsterPanel(), "ChooseMonster");
+        mainPanel.add(createChooseMonsterPanel(), "ChooseMonster");
         mainPanel.add(createDungeonPanel(), "Dungeon");
         mainPanel.add(createManageMonstersPanel(), "ManageMonsters");
 
@@ -98,20 +98,20 @@ public class UI {
         cardLayout.show(mainPanel, "Adventure");
     
         elapsedTime = 0;
-        adventureTimer = new Timer(1000, new ActionListener() {
+        adventureTimer = new Timer(1000, new ActionListener()) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 elapsedTime++;
                 stopwatchLabel.setText("Waktu: " + elapsedTime + " detik");
-                if (new Random().nextInt(10) < 2) { 
+                if (new Random().nextInt(10) < 2) {
                     encounterMonster();
                 } else {
-                  
                     String movementText = getRandomMovementText();
                     dungeonInfo.append(movementText + "\n");
                 }
-            }
-        });
+            }};
+    
+        
         adventureTimer.start();
     }
     
