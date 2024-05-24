@@ -1,7 +1,6 @@
 package Game;
 
 import Monsters.*;
-import Monsters.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,36 +47,50 @@ public class UI {
         frame.add(mainPanel);
         frame.setVisible(true);
     }
-    private void startAdventure() {
-        JPanel panel = new JPanel(new BorderLayout());
-        stopwatchLabel = new JLabel("Waktu: 0 detik", JLabel.CENTER);
-        panel.add(stopwatchLabel, BorderLayout.NORTH);
-    
-        dungeonInfo = new JTextArea();
-        dungeonInfo.setEditable(false);
-        panel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
-    
-        JButton stopButton = new JButton("Hentikan Petualangan");
-        stopButton.addActionListener(e -> stopAdventure());
-        panel.add(stopButton, BorderLayout.SOUTH);
-    
-        mainPanel.add(panel, "Adventure");
-        cardLayout.show(mainPanel, "Adventure");
-    
-        elapsedTime = 0;
-        adventureTimer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                elapsedTime++;
-                stopwatchLabel.setText("Waktu: " + elapsedTime + " detik");
-                if (new Random().nextInt(10) < 2) {
-                    encounterMonster();
-                } else {
-                    String movementText = getRandomMovementText();
-                    dungeonInfo.append(movementText + "\n");
+    private void startAdventure() throws PalworldException{
+        try{
+            JPanel panel = new JPanel(new BorderLayout());
+            stopwatchLabel = new JLabel("Waktu: 0 detik", JLabel.CENTER);
+            panel.add(stopwatchLabel, BorderLayout.NORTH);
+        
+            dungeonInfo = new JTextArea();
+            dungeonInfo.setEditable(false);
+            panel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
+        
+            JButton stopButton = new JButton("Hentikan Petualangan");
+            stopButton.addActionListener(e -> stopAdventure());
+            panel.add(stopButton, BorderLayout.SOUTH);
+        
+            mainPanel.add(panel, "Adventure");
+            cardLayout.show(mainPanel, "Adventure");
+        
+            elapsedTime = 0;
+            adventureTimer = new Timer(1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    elapsedTime++;
+                    stopwatchLabel.setText("Waktu: " + elapsedTime + " detik");
+                    if (new Random().nextInt(10) < 2) {
+                        try {
+                            encounterMonster();
+                        } catch (Exception d) {
+                            try {
+                                throw new PalworldException("Failed to encounter monster: " + d.getMessage());
+                            } catch (PalworldException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    } else {
+                        String movementText = getRandomMovementText();
+                        dungeonInfo.append(movementText + "\n");
+                    }
                 }
-            }
-        });
+            });
+
+        }
+        catch (Exception e) {
+            throw new PalworldException("Failed to start adventure: " + e.getMessage());
+        }
           
     
         
@@ -114,18 +127,23 @@ public class UI {
         cardLayout.show(mainPanel, "Homebase");
     }
     
-    private void encounterMonster() {
-        adventureTimer.stop(); 
-        selectMonsterForBattle();
-        randomMonsterLawan(monsterDipilih);
-        updateDungeonPanel();
-        dungeonInfo.append("Anda bertemu dengan " + monsterLawan.getName() + "!\n");
-        int result = JOptionPane.showConfirmDialog(frame, "Anda bertemu dengan " + monsterLawan.getName() + ". Apakah Anda ingin bertarung?", "Encounter", JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.YES_OPTION) {
-            cardLayout.show(mainPanel, "Dungeon");
-        } else {
-            adventureTimer.start(); 
-            cardLayout.show(mainPanel, "Adventure");
+    private void encounterMonster() throws PalworldException {
+        try {
+            adventureTimer.stop(); 
+            selectMonsterForBattle();
+            randomMonsterLawan(monsterDipilih);
+            updateDungeonPanel();
+            dungeonInfo.append("Anda bertemu dengan " + monsterLawan.getName() + "!\n");
+            int result = JOptionPane.showConfirmDialog(frame, "Anda bertemu dengan " + monsterLawan.getName() + ". Apakah Anda ingin bertarung?", "Encounter", JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                cardLayout.show(mainPanel, "Dungeon");
+            } else {
+                adventureTimer.start(); 
+                cardLayout.show(mainPanel, "Adventure");
+            }
+            
+        } catch (Exception e) {
+            throw new PalworldException("Failed to encounter monster: " + e.getMessage());
         }
     }
     private void selectMonsterForBattle() {
@@ -399,7 +417,6 @@ public class UI {
                 outputArea.append("Damage Potion bought for 75 Gold.\n");
             }
         });
-        // Home base button
         JButton homeBaseButton = new JButton("Return to Home Base");
         homeBaseButton.addActionListener(new ActionListener() {
             @Override
@@ -492,7 +509,13 @@ public class UI {
             } else {
                 player.selectedMonsters = selectedMonsters;
                 JOptionPane.showMessageDialog(frame, "Anda membawa " + selectedMonsters.size() + " monster ke dungeon.");
-                startAdventure(); // Mulai petualangan setelah memilih monster
+                
+                try{
+                    startAdventure(); // Mulai petualangan setelah memilih monster
+                }
+                catch (PalworldException e){
+                    JOptionPane.showMessageDialog(frame, e.getMessage());
+                }
             }
         }
     }
