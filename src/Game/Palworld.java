@@ -1,8 +1,5 @@
 package Game;
 
-import Monsters.*;
-import java.util.*;
-
 public class Palworld {
     /*
         GAME TURN BASE 
@@ -37,29 +34,6 @@ public class Palworld {
      * - perubahan elemen tidak bisa dilakukan ke sembarang elemen
      */    
 
-
-    public static int PilihMenu(){
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Selamat datang di Palworld!");
-        System.out.println("1. Start Game");
-        System.out.println("2. Load Game");
-        System.out.println("3. Exit (Auto Save)");
-        System.out.print("Pilih menu: ");
-
-        int pilihMenu = sc.nextInt();
-        
-        sc.nextLine();
-        return pilihMenu;
-    }
-   
-
-    public static Map<String, Monster> ArraytoMap(List<Monster> monsters){
-        Map<String, Monster> monsterMap = new HashMap<>();
-        for(Monster monster : monsters){
-            monsterMap.put(monster.getName(), monster);
-        }
-        return monsterMap;
-    }
     public static void main(String[] args) {
         
         //     Scanner sc = new Scanner(System.in);

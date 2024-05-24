@@ -83,7 +83,6 @@ public class SaveAndLoad {
         // } catch (IOException e) {
         //     e.printStackTrace();
         // }
-        System.out.println("hi");
     }
     
 }

@@ -5,6 +5,17 @@ public class Player {
     private String name = null;
     public List<Monster> monsters = new ArrayList<>();
     public List<Monster> selectedMonsters = new ArrayList<>();
+
+    public int gold;
+
+    public int getGold() {
+        return this.gold;
+    }
+
+    public void addGold(int gold) {
+        this.gold += gold;
+    }
+
     public Player(String name){
        this.name = name;
     }

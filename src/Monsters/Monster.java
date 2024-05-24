@@ -16,7 +16,17 @@ public abstract class Monster implements Serializable{
     private int hp = 100;
     private int exp = 0;
     public boolean evolved = false;
-    private final int damage = 10;
+    private int damage = 10;
+    
+    
+    public int getDamage(){
+        return this.damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
     private elements elemen;
     public Monster(String name, int level, int hp, int exp, elements elemen){
         this.name = name;
@@ -73,11 +83,7 @@ public abstract class Monster implements Serializable{
     public void setElemen(elements elemen) {
         this.elemen = elemen;
     }
-    public void setDamage(float damage){
-    }
-    public int getDamage(){
-        return this.damage;
-    }
+   
     public void BasicAttack(Monster monster){
         monster.setHp(monster.getHp() - (int) getDamage());
     }
