@@ -322,22 +322,31 @@ public class UI {
         evolveButton.addActionListener(e -> {
             for (Monster monster : player.monsters) {
                 if (!monster.evolved) {
-                    String newElement = JOptionPane.showInputDialog(frame, "Enter new element for " + monster.getName() + ":");
-                    if (newElement != null) {
-                        Monster evolvedMonster = monster.Evolve(newElement);
-                        if (evolvedMonster != null) {
-                            player.monsters.remove(monster);
-                            player.monsters.add(evolvedMonster);
-                            JOptionPane.showMessageDialog(frame, "Monster evolved to " + evolvedMonster.getName());
-                        } else {
-                            JOptionPane.showMessageDialog(frame, "Evolution failed!");
+                    if (monster.getLevel() >= 10) {
+                        String newElement = JOptionPane.showInputDialog(frame, 
+                            "Enter new element for " + monster.getName() + ":\n" +
+                            "(API, ANGIN, AIR, ES, TANAH), element should be the most logical.");
+                        
+                        if (newElement != null) {
+                            Monster evolvedMonster = monster.Evolve(newElement);
+                            if (evolvedMonster != null) {
+                                player.monsters.remove(monster);
+                                player.monsters.add(evolvedMonster);
+                                JOptionPane.showMessageDialog(frame, "Monster evolved to " + evolvedMonster.getName());
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Evolution failed! Invalid element.");
+                            }
                         }
+                    } 
+                    else {
+                        JOptionPane.showMessageDialog(frame, monster.getName() + " needs to be at least level 10 to evolve.");
                     }
                 } else {
                     JOptionPane.showMessageDialog(frame, monster.getName() + " cannot evolve anymore.");
                 }
             }
         });
+        
         panel.add(evolveButton);
     
         JButton buyItemButton = new JButton("Beli Item");
@@ -399,6 +408,17 @@ public class UI {
                 outputArea.append("Damage Potion bought for 75 Gold.\n");
             }
         });
+        // Home base button
+    JButton homeBaseButton = new JButton("Return to Home Base");
+    homeBaseButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            CardLayout cardLayout = (CardLayout) mainPanel.getLayout();
+            cardLayout.show(mainPanel, "HomeBase");
+        }
+    });
+
+    panel.add(homeBaseButton, BorderLayout.SOUTH);
 
         return panel;
     }
