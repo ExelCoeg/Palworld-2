@@ -1,12 +1,16 @@
 package Game;
+
 import Monsters.*;
+import Items.Potion;
 import java.util.*;
+
 public class Player {
     private String name = null;
     public List<Monster> monsters = new ArrayList<>();
     public List<Monster> selectedMonsters = new ArrayList<>();
 
-    public int gold;
+    public List<Potion> potions = new ArrayList<>();
+    public int gold = 100;
 
     public int getGold() {
         return this.gold;
@@ -16,11 +20,7 @@ public class Player {
         this.gold += gold;
     }
 
-    public Player(String name){
-       this.name = name;
-    }
-    public Player(String name, List<Monster> monsters){
-        this.monsters = new ArrayList<>();
+    public Player(String name) {
         this.name = name;
     }
     public String getName(){
@@ -29,14 +29,31 @@ public class Player {
     public void setName(String name){
        this.name = name;
     }
-    public Player(){
-        
+
+    public Player(String name, List<Monster> monsters) {
+        this.monsters = monsters;
+        this.name = name;
     }
 
-    public void PrintMonsters(){
+    public void addPotion(Potion potion) {
+        this.potions.add(potion);
+    }
+
+    public boolean usePotion(Class<? extends Potion> potionClass, Monster enemy) {
+        for (Potion potion : potions) {
+            if (potionClass.isInstance(potion)) {
+                potion.useItem(this, enemy);
+                potions.remove(potion);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void printMonsters() {
         System.out.println();
-        for(int i=0;i<monsters.size();i++){
-            System.out.println((i+1)+ "." + monsters.get(i).getName());
+        for (int i = 0; i < monsters.size(); i++) {
+            System.out.println((i + 1) + "." + monsters.get(i).getName());
             System.out.println("Level: " + monsters.get(i).getLevel());
             System.out.println("HP: " + monsters.get(i).getHp());
             System.out.println("EXP: " + monsters.get(i).getExp());
@@ -45,7 +62,4 @@ public class Player {
         }
         System.out.println();
     }
-   
-   
-    
 }

@@ -1,7 +1,16 @@
 package Items;
 
-public abstract class Potion{
-    public void UseItem(){
-        System.out.println("Monster menggunakan potion");
+import Game.Player;
+import Monsters.Monster;
+
+public abstract class Potion {
+    public String name;
+    public int price;
+
+    public Potion(String name, int price) {
+        this.name = name;
+        this.price = price;
     }
+
+    public abstract void useItem(Player player, Monster enemy);
 }
