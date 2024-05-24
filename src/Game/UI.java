@@ -3,22 +3,29 @@ package Game;
 import Monsters.*;
 import Monsters.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
 public class UI {
-    private CardLayout cardLayout;
     private JFrame frame;
+    private CardLayout cardLayout;
     private JPanel mainPanel;
-    private JLabel playerMonsterHpLabel,enemyMonsterHpLabel, playerActionLabel, enemyActionLabel,stopwatchLabel, playerMonsterInfoLabel, enemyMonsterInfoLabel;
+    private Player player = new Player();
     private JTextArea dungeonInfo;
-    private Monster monsterDipilih,monsterLawan;
+    private JLabel playerMonsterHpLabel;
+    private JLabel enemyMonsterHpLabel;
+    private JLabel playerActionLabel;
+    private JLabel enemyActionLabel;
+    private Monster monsterDipilih;
+    private Monster monsterLawan;
     private Timer adventureTimer;
     private int elapsedTime;
-    
-    private Player player = new Player();
+    private JLabel stopwatchLabel;  
+    private JLabel playerMonsterInfoLabel;
+    private JLabel enemyMonsterInfoLabel;   
+    private JLabel goldLabel;
+
 
     private DefaultListModel<String> monsterListModel;
     int width = 600, height = 400;
@@ -26,6 +33,16 @@ public class UI {
     public UI() {
         createUI();
     }
+    private void updateGoldLabel(JLabel goldLabel) {
+        goldLabel.setText("Gold: " + player.getGold());
+    }
+    
+    // Example of adding gold and updating the label
+    private void addGoldAndRefresh(int amount) {
+        player.addGold(amount);
+        updateGoldLabel(goldLabel);
+    }
+    
 
     public void createUI() {
         frame = new JFrame("Palworld Game");
@@ -39,7 +56,6 @@ public class UI {
 
         mainPanel.add(createMainMenuPanel(), "MainMenu");
         mainPanel.add(createNewGamePanel(), "NewGame");
-        mainPanel.add(createHomebasePanel(), "HomeBase");
         mainPanel.add(createChooseMonsterPanel(), "ChooseMonster");
         mainPanel.add(createDungeonPanel(), "Dungeon");
         mainPanel.add(createManageMonstersPanel(), "ManageMonsters");
@@ -48,6 +64,36 @@ public class UI {
         frame.add(mainPanel);
         frame.setVisible(true);
     }
+
+    // private void startAdventure() {
+    //     JPanel panel = new JPanel(new BorderLayout());
+    //     stopwatchLabel = new JLabel("Waktu: 0 detik", JLabel.CENTER);
+    //     panel.add(stopwatchLabel, BorderLayout.NORTH);
+    
+    //     dungeonInfo = new JTextArea();
+    //     dungeonInfo.setEditable(false);
+    //     panel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
+    
+    //     JButton stopButton = new JButton("Hentikan Petualangan");
+    //     stopButton.addActionListener(e -> stopAdventure());
+    //     panel.add(stopButton, BorderLayout.SOUTH);
+    
+    //     mainPanel.add(panel, "Adventure");
+    //     cardLayout.show(mainPanel, "Adventure");
+    
+    //     elapsedTime = 0;
+    //     adventureTimer = new Timer(1000, new ActionListener() {
+    //         @Override
+    //         public void actionPerformed(ActionEvent e) {
+    //             elapsedTime++;
+    //             stopwatchLabel.setText("Waktu: " + elapsedTime + " detik");
+    //             if (new Random().nextInt(10) < 2) { // 20% chance to encounter a monster every second
+    //                 encounterMonster();
+    //             }
+    //         }
+    //     });
+    //     adventureTimer.start();
+    // }
     private void startAdventure() {
         JPanel panel = new JPanel(new BorderLayout());
         stopwatchLabel = new JLabel("Waktu: 0 detik", JLabel.CENTER);
@@ -75,9 +121,7 @@ public class UI {
                 } else {
                     String movementText = getRandomMovementText();
                     dungeonInfo.append(movementText + "\n");
-                }
-            }
-        });
+                }}});
           
     
         
@@ -178,7 +222,7 @@ public class UI {
     }
     private void chooseMonster(int choice) {
         switch (choice) {
-            case 1 -> player.monsters.add(new MonsterApi("Flameling", 1, 100, 100, Monster.elements.API));
+            case 1 -> player.monsters.add(new MonsterApi("Flameling", 1, 100, 0, Monster.elements.API));
             case 2 -> player.monsters.add(new MonsterAngin("Zephyrkin", 1, 100, 0, Monster.elements.ANGIN));
             case 3 -> player.monsters.add(new MonsterAir("Aquabot", 1, 100, 0, Monster.elements.AIR));
             case 4 -> player.monsters.add(new MonsterEs("Frostlet", 1, 100, 0, Monster.elements.ES));
@@ -197,49 +241,54 @@ public class UI {
         for (int i = 0; i < monsters.length; i++) {
             JButton monsterButton = new JButton(monsters[i]);
             int finalI = i;
-            monsterButton.addActionListener(e -> {
-
-                chooseMonster(finalI + 1);
-                updateMonsterList();
-            }
-            
-            );
+            monsterButton.addActionListener(e -> chooseMonster(finalI + 1));
             panel.add(monsterButton);
         }
         return panel;
     }
 
     private JPanel createMainMenuPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
+    JPanel panel = new JPanel();
+    panel.setLayout(null); // Use null layout for absolute positioning
 
-        JLabel welcomeLabel = new JLabel("Selamat datang di Palworld!", JLabel.CENTER);
-        welcomeLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 32));
-        welcomeLabel.setBounds(80, 50, 440, 50);
-        panel.add(welcomeLabel);
+    // Add welcome label
+    JLabel welcomeLabel = new JLabel("Selamat datang di Palworld!", JLabel.CENTER);
+    welcomeLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 32));
+    welcomeLabel.setBounds(100, 50, 440, 50);
+    panel.add(welcomeLabel);
 
-        JButton newGameButton = new JButton("Start Game");
-        newGameButton.setBounds(250, 150, 100, 50);
-        newGameButton.addActionListener(e -> cardLayout.show(mainPanel, "NewGame"));
-        panel.add(newGameButton);
+    // Add image label
+    ImageIcon imageIcon = new ImageIcon("path/to/your/image.png"); // Specify the correct path to your image file
+    JLabel imageLabel = new JLabel(imageIcon);
+    imageLabel.setBounds(200, 300, imageIcon.getIconWidth(), imageIcon.getIconHeight()); // Set bounds as needed
+    panel.add(imageLabel);
 
-        JButton loadGameButton = new JButton("Load Game");
-        loadGameButton.setBounds(250, 220, 100, 50);
-        loadGameButton.addActionListener(e -> {
-            // Load game logic here
-        });
-        panel.add(loadGameButton);
+    // Add New Game button
+    JButton newGameButton = new JButton("Start Game");
+    newGameButton.setBounds(270, 150, 100, 50);
+    newGameButton.addActionListener(e -> cardLayout.show(mainPanel, "NewGame"));
+    panel.add(newGameButton);
 
-        JButton exitButton = new JButton("Exit (Auto Save)");
-        exitButton.setBounds(250, 290, 100, 50);
-        exitButton.addActionListener(e -> {
-            // Save game logic here
-            System.exit(0);
-        });
-        panel.add(exitButton);
+    // Add Load Game button
+    JButton loadGameButton = new JButton("Load Game");
+    loadGameButton.setBounds(270, 220, 100, 50);
+    loadGameButton.addActionListener(e -> {
+        // Load game logic here
+    });
+    panel.add(loadGameButton);
 
-        return panel;
-    }
+    // Add Exit button
+    JButton exitButton = new JButton("Exit (Auto Save)");
+    exitButton.setBounds(270, 290, 100, 50);
+    exitButton.addActionListener(e -> {
+        // Save game logic here
+        System.exit(0);
+    });
+    panel.add(exitButton);
+
+    return panel;
+}
+
 
     private JPanel createNewGamePanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -277,28 +326,19 @@ public class UI {
         playerMonsterInfoLabel.setText("Player Monster: " + (monsterDipilih != null ? monsterDipilih.getName() + " (HP: " + monsterDipilih.getHp() + ")" : "N/A"));
         enemyMonsterInfoLabel.setText("Enemy Monster: " + (monsterLawan != null ? monsterLawan.getName() + " (HP: " + monsterLawan.getHp() + ")" : "N/A"));
     }
-
-    private void checkLevelUp(Monster monster) {
-        while (monster.getExp() >= 100) {
-            monster.setExp(monster.getExp() - 100);
-            monster.setLevel(monster.getLevel() + 1);
-            monster.setHp(monster.getHp() + 20); // contoh kenaikan HP setiap level up
-            monster.setDamage(monster.getDamage() + 5); // contoh kenaikan Attack setiap level up
-            JOptionPane.showMessageDialog(frame, monster.getName() + " telah naik ke level " + monster.getLevel() + "!");
-        }
-    }
-
     private JPanel createHomebasePanel() {
-        JPanel panel = new JPanel(new GridLayout(6, 1));
+        JPanel panel = new JPanel(new GridLayout(7, 1));
         JLabel homebaseLabel = new JLabel(("Selamat datang di Homebase! " + player.getName()), JLabel.CENTER);
         panel.add(homebaseLabel);
+
+        JLabel goldLabel = new JLabel("Gold: " + player.getGold(), JLabel.CENTER);
+        panel.add(goldLabel);
     
         JButton healButton = new JButton("Heal Monster");
         healButton.addActionListener(e -> {
             for (Monster monster : player.monsters) {
                 monster.Heal();
             }
-            updateMonsterList();
             JOptionPane.showMessageDialog(frame, "All monsters healed!");
         });
         panel.add(healButton);
@@ -317,7 +357,6 @@ public class UI {
                             if (evolvedMonster != null) {
                                 player.monsters.remove(monster);
                                 player.monsters.add(evolvedMonster);
-                                updateMonsterList();
                                 JOptionPane.showMessageDialog(frame, "Monster evolved to " + evolvedMonster.getName());
                             } else {
                                 JOptionPane.showMessageDialog(frame, "Evolution failed! Invalid element.");
@@ -340,23 +379,19 @@ public class UI {
         buyItemButton.addActionListener(e -> cardLayout.show(mainPanel, "BuyItem")); // Switch to the BuyPotion panel
         panel.add(buyItemButton);
     
-        
-
         JButton dungeonButton = new JButton("Keluar Homebase");
         dungeonButton.addActionListener(e -> chooseMonstersForDungeon());
         panel.add(dungeonButton);
-        
     
         JButton manageMonstersButton = new JButton("Manage Monsters");
         mainPanel.add(createManageMonstersPanel(), "ManageMonsters");
         manageMonstersButton.addActionListener(e -> cardLayout.show(mainPanel, "ManageMonsters"));
         panel.add(manageMonstersButton);
     
-    
+        panel.revalidate();
+         panel.repaint();
         return panel;
     }
-
-    
     private JPanel BuyPotion() {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -400,14 +435,14 @@ public class UI {
             }
         });
         // Home base button
-        JButton homeBaseButton = new JButton("Return to Home Base");
-        homeBaseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                CardLayout cardLayout = (CardLayout) mainPanel.getLayout();
-                cardLayout.show(mainPanel, "HomeBase");
-            }
-        });
+    JButton homeBaseButton = new JButton("Return to Home Base");
+    homeBaseButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            CardLayout cardLayout = (CardLayout) mainPanel.getLayout();
+            cardLayout.show(mainPanel, "HomeBase");
+        }
+    });
 
     panel.add(homeBaseButton, BorderLayout.SOUTH);
 
@@ -487,7 +522,7 @@ public class UI {
     
             if (selectedMonsters.size() > 3) {
                 JOptionPane.showMessageDialog(frame, "Anda hanya bisa membawa maksimal 3 monster!");
-            } else if (selectedMonsters.isEmpty()) {
+            } else if (selectedMonsters.size() == 0) {
                 JOptionPane.showMessageDialog(frame, "Anda harus memilih setidaknya 1 monster!");
             } else {
                 player.selectedMonsters = selectedMonsters;
@@ -498,7 +533,44 @@ public class UI {
     }
 
     private JPanel createManageMonstersPanel() {
-     
+        // JPanel panel = new JPanel(new BorderLayout());
+        // JLabel label = new JLabel("Manage Your Monsters", JLabel.CENTER);
+        // panel.add(label, BorderLayout.NORTH);
+    
+        // DefaultListModel<String> listModel = new DefaultListModel<>();
+        // for (Monster monster : player.monsters) {
+        //     listModel.addElement(monster.getName() + " (HP: " + monster.getHp() + ")");
+        // }
+    
+        // JList<String> monsterList = new JList<>(listModel);
+        // monsterList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        // JScrollPane listScrollPane = new JScrollPane(monsterList);
+    
+        // JTextArea monsterDetails = new JTextArea();
+        // monsterDetails.setEditable(false);
+    
+        // monsterList.addListSelectionListener(e -> {
+        //     if (!e.getValueIsAdjusting()) {
+        //         int index = monsterList.getSelectedIndex();
+        //         if (index >= 0) {
+        //             Monster selectedMonster = player.monsters.get(index);
+        //             monsterDetails.setText("Name: " + selectedMonster.getName() +
+        //                     "\nHP: " + selectedMonster.getHp() +
+        //                     "\nLevel: " + selectedMonster.getLevel() +
+        //                     "\nElement: " + selectedMonster.getElemen().toString());
+        //         }
+        //     }
+        // });
+    
+        // JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listScrollPane, new JScrollPane(monsterDetails));
+        // splitPane.setDividerLocation(200);
+        // panel.add(splitPane, BorderLayout.CENTER);
+    
+        // JButton backButton = new JButton("Back to Base");
+        // backButton.addActionListener(e -> cardLayout.show(mainPanel, "Homebase"));
+        // panel.add(backButton, BorderLayout.SOUTH);
+    
+        // return panel;
         JPanel panel = new JPanel(new BorderLayout());
         JLabel label = new JLabel("Manage Your Monsters", JLabel.CENTER);
         panel.add(label, BorderLayout.NORTH);
@@ -590,19 +662,33 @@ public class UI {
         
         if (monsterDipilih.getHp() <= 0) {
             JOptionPane.showMessageDialog(frame, "Anda Kalah dan " + monsterDipilih.getName() + " pingsan\n");
-            updateMonsterList();
+
             cardLayout.show(mainPanel,"Homebase");
         } 
-    
+        // else if (monsterLawan.getHp() <= 0) {
+        //     JOptionPane.showMessageDialog(frame, "Anda Menang dan " + monsterDipilih.getName() +" mendapatkan " + monsterLawan.getLevel() * 10 + " exp\n");
+            
+        //     monsterDipilih.setExp(monsterDipilih.getExp() + monsterLawan.getLevel() * 10);
+
+        //     player.monsters.add(monsterLawan);
+
+        //     JOptionPane.showMessageDialog(frame, "Anda telah mendapatkan monster baru!\n" + "Level:" + monsterLawan.getLevel() + "\n Elemen: " + monsterLawan.getElemen());
+            
+        //     cardLayout.show(mainPanel,"Homebase");
+        //     String monsterName = JOptionPane.showInputDialog(frame, "Anda menang melawan " + monsterLawan.getName() + "! Masukkan nama untuk monster yang baru diperoleh:");
+        //     if (monsterName != null && !monsterName.isEmpty()) {
+        //         monsterLawan.setName(monsterName);
+        //         JOptionPane.showMessageDialog(frame, "Anda memberi nama monster baru: " + monsterName);
+        //     } else {
+        //         monsterLawan.setName("MonsterBaru");
+        //         JOptionPane.showMessageDialog(frame, "Anda tidak memberikan nama. Monster baru disebut MonsterBaru.");
+        //     }
+        // }
         else if (monsterLawan.getHp() <= 0) {
             monsterDipilih.setExp(monsterDipilih.getExp() + monsterLawan.getLevel() * 10);
-            player.addGold(monsterLawan.getLevel() * 10);   
-            JOptionPane.showMessageDialog(frame, "Anda Menang dan " + monsterDipilih.getName() + " mendapatkan " + //
-            monsterLawan.getLevel() * 10 + " exp\n" + //
-            "Anda juga mendapatkan " + monsterLawan.getLevel() * 10 + " gold\n");
-            checkLevelUp(monsterDipilih); // Tambahkan ini untuk memeriksa level up
-            int result = JOptionPane.showConfirmDialog(frame, "Anda mengalahkan " + monsterLawan.getName() + //
-            ". Apakah Anda ingin menangkap monster ini?", "Capture", JOptionPane.YES_NO_OPTION);
+            JOptionPane.showMessageDialog(frame, "Anda Menang dan " + monsterDipilih.getName() + " mendapatkan " + monsterLawan.getLevel() * 10 + " exp\n");
+
+            int result = JOptionPane.showConfirmDialog(frame, "Anda mengalahkan " + monsterLawan.getName() + ". Apakah Anda ingin menangkap monster ini?", "Capture", JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
                 String monsterName = JOptionPane.showInputDialog(frame, "Berikan nama untuk monster baru ini:");
                 if (monsterName != null && !monsterName.isEmpty()) {
@@ -612,7 +698,7 @@ public class UI {
                     JOptionPane.showMessageDialog(frame, monsterName + " telah ditambahkan ke koleksi monster Anda!");
                 }
             }
-            
+
             cardLayout.show(mainPanel, "Homebase");
         }
         String actionString = getActionString(action);
@@ -668,5 +754,6 @@ public class UI {
    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(UI::new);
+        
     }
 }
