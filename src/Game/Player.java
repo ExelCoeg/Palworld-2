@@ -6,7 +6,7 @@ public class Player {
     public List<Monster> monsters = new ArrayList<>();
     public List<Monster> selectedMonsters = new ArrayList<>();
 
-    public int gold;
+    public int gold = 50;
 
     public int getGold() {
         return this.gold;
