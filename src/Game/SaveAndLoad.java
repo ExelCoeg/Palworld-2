@@ -99,6 +99,8 @@ class GameState implements Serializable {
         this.monsters = monsters;
         this.items = items;
     }
+    public GameState(){
+    }
     
     public String getPlayerName() {
         return this.playerName;
