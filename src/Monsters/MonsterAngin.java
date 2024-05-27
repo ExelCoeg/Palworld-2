@@ -7,9 +7,7 @@ public class MonsterAngin extends Monster implements ElementalMonster{
     @Override
     public void ElementalAttack(Monster monsterLawan){
        if(monsterLawan.getElemen() == Monster.elements.TANAH){
-
-        System.out.println("Serangan efektif!");
-
+            System.out.println("Serangan efektif!");
        }
        else{
             System.out.println("Serangan tidak efektif!");
