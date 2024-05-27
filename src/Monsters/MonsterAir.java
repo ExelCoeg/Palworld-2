@@ -10,7 +10,7 @@ public class MonsterAir extends Monster implements ElementalMonster{
     @Override
     public void ElementalAttack(Monster monsterLawan){
        if(monsterLawan.getElemen() == Monster.elements.API){
-            monsterLawan.setHp(monsterLawan.getHp() - (int)(0.1 * monsterLawan.getHp()));
+            System.out.println("Serangan efektif!");
        }
        else{
             System.out.println("Serangan tidak efektif!");
