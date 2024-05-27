@@ -1,11 +1,10 @@
 package Game;
 
-import Items.ElementalPotion;
-import Items.HealthPotion;
+import Items.*;
 import Monsters.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -13,7 +12,7 @@ import javax.swing.*;
 public class UI {
     private CardLayout cardLayout;
     private JFrame frame;
-    private JPanel panel, mainPanel;
+    private JPanel mainPanel;
     private JLabel playerMonsterHpLabel,enemyMonsterHpLabel, playerActionLabel, enemyActionLabel,stopwatchLabel, playerMonsterInfoLabel, enemyMonsterInfoLabel,potionLabel,goldLabel, homebaseLabel;
     private JTextArea dungeonInfo;
     private Monster monsterDipilih,monsterLawan;
@@ -53,7 +52,7 @@ public class UI {
     }
     private void startAdventure() throws PalworldException{
         try{
-            panel = new JPanel(new BorderLayout());
+            JPanel panel = new JPanel(new BorderLayout());
             stopwatchLabel = new JLabel("Waktu: 0 detik", JLabel.CENTER);
             panel.add(stopwatchLabel, BorderLayout.NORTH);
         
@@ -246,12 +245,42 @@ public class UI {
         newGameButton.addActionListener(e -> cardLayout.show(mainPanel, "NewGame"));
         panel.add(newGameButton);
 
-        JButton loadGameButton = new JButton("Load Game");
-        loadGameButton.setBounds(250, 220, 100, 50);
-        loadGameButton.addActionListener(e -> {
-            // Load game logic here
-        });
-        panel.add(loadGameButton);
+        JButton loadButton = new JButton("Load Game");
+        loadButton.setBounds(250, 220, 100, 50);
+        loadButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String[] saveFiles = new File("src/Saves").list((dir, name) -> name.endsWith(".txt"));
+            if (saveFiles != null && saveFiles.length > 0) {
+                String selectedFile = (String) JOptionPane.showInputDialog(
+                    frame, 
+                    "Select a save file to load:", 
+                    "Load Game", 
+                    JOptionPane.PLAIN_MESSAGE, 
+                    null, 
+                    saveFiles, 
+                    saveFiles[0]
+                );
+                System.out.println(selectedFile);
+                if (selectedFile != null) {
+                    try {
+                        GameState loadedGameState = SaveAndLoad.loadGame(selectedFile);
+                        player.setName(loadedGameState.getPlayerName());
+                        player.setMonsters(loadedGameState.getMonsters());
+                        player.setPotions(loadedGameState.getPotions());
+                        mainPanel.add(createHomebasePanel(), "Homebase");
+                        cardLayout.show(mainPanel, "Homebase");
+                    } catch (IOException | ClassNotFoundException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(frame, "Failed to load the game!");
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(frame, "No save files found!");
+            }
+        }
+    });
+        panel.add(loadButton);
 
         JButton exitButton = new JButton("Exit");
         exitButton.setBounds(250, 290, 100, 50);
@@ -301,8 +330,8 @@ public class UI {
         while (monster.getExp() >= 100) {
             monster.setExp(monster.getExp() - 100);
             monster.setLevel(monster.getLevel() + 1);
-            monster.setHp(monster.getHp() + 20); // contoh kenaikan HP setiap level up
-            monster.setDamage(monster.getDamage() + 5); // contoh kenaikan Attack setiap level up
+            monster.setHp(monster.getHp() + 20);
+            monster.setDamage(monster.getDamage() + 5);
             JOptionPane.showMessageDialog(frame, monster.getName() + " telah naik ke level " + monster.getLevel() + "!");
         }
     }
@@ -312,8 +341,8 @@ public class UI {
     private JPanel createHomebasePanel() {
         JPanel panel = new JPanel(new GridLayout(7, 1));
         homebaseLabel = new JLabel(("Selamat datang di Homebase! " + player.getName()), JLabel.CENTER);
-        panel.revalidate(); //added to refresh 
-        panel.repaint();  //added to refresh 
+        panel.revalidate();
+        panel.repaint();   
         panel.add(homebaseLabel);
         JButton healButton = new JButton("Heal Monster");
         healButton.addActionListener(e -> {
@@ -362,7 +391,7 @@ public class UI {
             mainPanel.add(BuyPotion(), "BuyItem");
             cardLayout.show(mainPanel, "BuyItem");
             
-        }); // Switch to the BuyPotion panel
+        }); 
         panel.add(buyItemButton);
     
         
@@ -378,18 +407,18 @@ public class UI {
         panel.add(manageMonstersButton);
     
         updateHomebaseLabel(player.getName());
-        
-        saveButton.addActionListener(new ActionListener() {
+        saveButton = new JButton("Save Game");
+        panel.add(saveButton);
+   
+    saveButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // Panggil method untuk menyimpan permainan di sini
             try {
-                SaveAndLoad.saveGame(gameState, "nama_file_save");
-                // Tambahkan pesan bahwa permainan telah disimpan
+                GameState gameState = new GameState(player.getName(),player.getGold(), player.monsters, player.getPotions());
+                SaveAndLoad.saveGame(gameState, player.getName());
                 JOptionPane.showMessageDialog(frame, "Game saved successfully!");
             } catch (IOException ex) {
                 ex.printStackTrace();
-                // Tambahkan pesan kesalahan jika gagal menyimpan
                 JOptionPane.showMessageDialog(frame, "Failed to save the game!");
             }
         }

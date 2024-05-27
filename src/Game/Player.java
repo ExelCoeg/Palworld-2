@@ -7,9 +7,26 @@ import java.util.*;
 public class Player {
     private String name = null;
     public List<Monster> monsters = new ArrayList<>();
+    public List<Potion> potions = new ArrayList<>();
+
+    public List<Monster> getMonsters() {
+        return this.monsters;
+    }
+
+    public void setMonsters(List<Monster> monsters) {
+        this.monsters = monsters;
+    }
+
+    public List<Potion> getPotions() {
+        return this.potions;
+    }
+
+    public void setPotions(List<Potion> potions) {
+        this.potions = potions;
+    }
+
     public List<Monster> selectedMonsters = new ArrayList<>();
 
-    public List<Potion> potions = new ArrayList<>();
     public int gold = 100;
 
     public int getGold() {
