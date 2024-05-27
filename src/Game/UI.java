@@ -7,18 +7,21 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
+
+import Items.ElementalPotion;
+import Items.HealthPotion;
+import Items.Potion;
 public class UI {
     private CardLayout cardLayout;
     private JFrame frame;
     private JPanel mainPanel;
-    private JLabel playerMonsterHpLabel,enemyMonsterHpLabel, playerActionLabel, enemyActionLabel,stopwatchLabel, playerMonsterInfoLabel, //
-    enemyMonsterInfoLabel,goldLabelDungeon, goldLabel;
+    private JLabel playerMonsterHpLabel,enemyMonsterHpLabel, playerActionLabel, enemyActionLabel,stopwatchLabel, playerMonsterInfoLabel, enemyMonsterInfoLabel,potionLabel,goldLabel;
     private JTextArea dungeonInfo;
     private Monster monsterDipilih,monsterLawan;
     private Timer adventureTimer;
     private int elapsedTime;
     
-    private Player player = new Player();
+    private Player player = new Player(null);
 
     private DefaultListModel<String> monsterListModel;
     int width = 600, height = 400;
@@ -208,9 +211,10 @@ public class UI {
         cardLayout.show(mainPanel, "Homebase");
     }
     private JPanel createChooseMonsterPanel(){
-        JPanel panel = new JPanel(new GridLayout(6, 1));
+        JPanel panel = new JPanel(new GridLayout(7, 1));
         JLabel instructions = new JLabel("Select your first monster:", JLabel.CENTER);
         panel.add(instructions);
+        
 
         String[] monsters = {"Flameling (API)", "Zephyrkin (ANGIN)", "Aquabot (AIR)", "Frostlet (ES)", "Terrapup (TANAH)"};
         for (int i = 0; i < monsters.length; i++) {
@@ -308,10 +312,13 @@ public class UI {
     }
 
     private JPanel createHomebasePanel() {
-        JPanel panel = new JPanel(new GridLayout(6, 1));
+        JPanel panel = new JPanel(new GridLayout(7, 1));
         JLabel homebaseLabel = new JLabel(("Selamat datang di Homebase! " + player.getName()), JLabel.CENTER);
+        panel.revalidate(); //added to refresh 
+        panel.repaint();  //added to refresh 
         panel.add(homebaseLabel);
-    
+        JLabel goldLabel=new JLabel("Gold: "+player.getGold(),JLabel.CENTER);
+        panel.add(goldLabel);
         JButton healButton = new JButton("Heal Monster");
         healButton.addActionListener(e -> {
             for (Monster monster : player.monsters) {
@@ -355,6 +362,7 @@ public class UI {
         panel.add(evolveButton);
     
         JButton buyItemButton = new JButton("Beli Item");
+        // mainPanel.add(BuyPotion(), "BuyItem");
         buyItemButton.addActionListener(e -> cardLayout.show(mainPanel, "BuyItem")); // Switch to the BuyPotion panel
         panel.add(buyItemButton);
     
@@ -370,67 +378,74 @@ public class UI {
         manageMonstersButton.addActionListener(e -> cardLayout.show(mainPanel, "ManageMonsters"));
         panel.add(manageMonstersButton);
     
-    
+      
         return panel;
     }
+
     
     private JPanel BuyPotion() {
         JPanel panel = new JPanel(new BorderLayout());
-    
+        // mainPanel.add(createHomebasePanel(), "Homebase");
+
         JLabel title = new JLabel("Welcome to the Potion Shop!", JLabel.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 16));
         panel.add(title, BorderLayout.NORTH);
-    
-        goldLabel = new JLabel("Gold: " + player.getGold(), JLabel.CENTER); // Inisialisasi goldLabel dengan nilai awal
-        panel.add(goldLabel, BorderLayout.SOUTH);
-    
+
         JPanel potionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-    
+
         JButton healthPotionButton = new JButton("Buy Health Potion");
         JButton damagePotionButton = new JButton("Buy Damage Potion");
-    
-        JLabel healthPotionLabel = new JLabel("Price: 50 Gold");
-        JLabel damagePotionLabel = new JLabel("Price: 75 Gold");
-    
+
+        JLabel healthPotionLabel = new JLabel("Price: 5 Gold");
+        JLabel damagePotionLabel = new JLabel("Price: 5 Gold");
+
         potionPanel.add(healthPotionLabel);
         potionPanel.add(healthPotionButton);
         potionPanel.add(damagePotionLabel);
         potionPanel.add(damagePotionButton);
-    
+
         panel.add(potionPanel, BorderLayout.CENTER);
-    
+
         JTextArea outputArea = new JTextArea(5, 20);
         outputArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputArea);
-        panel.add(scrollPane, BorderLayout.EAST);
-    
-        // Action listeners for the buttons
+        panel.add(scrollPane, BorderLayout.SOUTH);
+
         healthPotionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (player.getGold() >= 50) {
-                    player.addGold(-50);
-                    outputArea.append("Health Potion bought for 50 Gold.\n");
-                    updateGoldLabel();
-                } else {
-                    outputArea.append("Not enough gold to buy Health Potion!\n");
+                if(player.getGold()>=5){
+                    player.addGold(-5);
+                    Potion Health=new HealthPotion("Health Potion",5);
+                    player.potions.add(Health);
+                    outputArea.append("Health Potion bought for 5 Gold.\n");
+                }
+                else{
+                    outputArea.append("You don't have enough gold.\n");
                 }
             }
         });
-    
+
         damagePotionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (player.getGold() >= 75) {
-                    player.addGold(75);
-                    outputArea.append("Damage Potion bought for 75 Gold.\n");
-                    updateGoldLabel();
-                } else {
-                    outputArea.append("Not enough gold to buy Damage Potion!\n");
-                }
+                healthPotionButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if(player.getGold()>=5){
+                            player.addGold(-5);
+                            Potion Elemental=new ElementalPotion("Damage Potion",5);
+                            player.potions.add(Elemental);
+                            outputArea.append("Health Potion bought for 5 Gold.\n");
+                        }
+                        else{
+                            outputArea.append("You don't have enough gold.\n");
+                        }
+                    }
+                });
+                
             }
         });
-    
         JButton homeBaseButton = new JButton("Return to Home Base");
         homeBaseButton.addActionListener(new ActionListener() {
             @Override
@@ -439,15 +454,12 @@ public class UI {
                 cardLayout.show(mainPanel, "HomeBase");
             }
         });
-    
-        panel.add(homeBaseButton, BorderLayout.WEST);
-    
+
+    panel.add(homeBaseButton, BorderLayout.SOUTH);
+   
         return panel;
     }
-    private void updateGoldLabel() {
-        goldLabel.setText("Gold: " + player.getGold());
-    }
-    
+
     private JPanel createDungeonPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel dungeonLabel = new JLabel("Selamat datang di Dungeon!", JLabel.CENTER);
@@ -466,7 +478,7 @@ public class UI {
         statusPanel.add(enemyMonsterHpLabel);
         statusPanel.add(playerActionLabel);
         statusPanel.add(enemyActionLabel);
-        
+    
         panel.add(statusPanel, BorderLayout.SOUTH);
     
         JPanel monsterInfoPanel = new JPanel(new GridLayout(2, 1));
@@ -474,10 +486,10 @@ public class UI {
         enemyMonsterInfoLabel = new JLabel("Enemy Monster: ", JLabel.CENTER);
         monsterInfoPanel.add(playerMonsterInfoLabel);
         monsterInfoPanel.add(enemyMonsterInfoLabel);
-        
+    
         panel.add(monsterInfoPanel, BorderLayout.CENTER);
     
-        JPanel actionPanel = new JPanel(new GridLayout(1, 3));
+        JPanel actionPanel = new JPanel(new GridLayout(1, 5)); // Adjusted grid layout to accommodate more buttons
     
         JButton basicAttackButton = new JButton("Basic Attack");
         basicAttackButton.addActionListener(e -> playerAction(1));
@@ -491,6 +503,14 @@ public class UI {
         elementalAttackButton.addActionListener(e -> playerAction(3));
         actionPanel.add(elementalAttackButton);
     
+        JButton useHealthPotionButton = new JButton("Use Health Potion");
+        useHealthPotionButton.addActionListener(e -> useHealthPotion());
+        actionPanel.add(useHealthPotionButton);
+    
+        JButton useDamagePotionButton = new JButton("Use Damage Potion");
+        useDamagePotionButton.addActionListener(e -> useDamagePotion());
+        actionPanel.add(useDamagePotionButton);
+    
         JPanel containerPanel = new JPanel(new BorderLayout());
         containerPanel.add(actionPanel, BorderLayout.NORTH);
     
@@ -498,6 +518,32 @@ public class UI {
     
         return panel;
     }
+    private void useHealthPotion() {
+        if (player.usePotion(HealthPotion.class, null)) {
+            dungeonInfo.append("Used a Health Potion. Player health increased.\n");
+            updatePlayerStatus();
+        } else {
+            dungeonInfo.append("No Health Potions available.\n");
+        }
+    }
+    private void useDamagePotion() {
+        // if (player.usePotion(DamagePotion.class, enemy)) {
+        //     dungeonInfo.append("Used a Damage Potion. Enemy health decreased.\n");
+        //     updateEnemyStatus();
+        // } 
+        if (player.usePotion(ElementalPotion.class, null)) {
+            dungeonInfo.append("No Damage Potions available.\n");
+        }
+    }
+    private void updatePlayerStatus() {
+        playerMonsterHpLabel.setText("Player HP: " + player.monsters.get(0).getHp());
+    }
+    
+    // Method to update enemy status display
+    private void updateEnemyStatus() {
+        // enemyMonsterHpLabel.setText("Enemy HP: " + enemy.getHp());
+    }
+
 
     private void chooseMonstersForDungeon() {
         JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -637,7 +683,6 @@ public class UI {
         else if (monsterLawan.getHp() <= 0) {
             monsterDipilih.setExp(monsterDipilih.getExp() + monsterLawan.getLevel() * 10);
             player.addGold(monsterLawan.getLevel() * 10);   
-            updateGoldLabel();
             JOptionPane.showMessageDialog(frame, "Anda Menang dan " + monsterDipilih.getName() + " mendapatkan " + //
             monsterLawan.getLevel() * 10 + " exp\n" + //
             "Anda juga mendapatkan " + monsterLawan.getLevel() * 10 + " gold\n");
@@ -650,10 +695,10 @@ public class UI {
                     monsterLawan.setName(monsterName);
                     player.monsters.add(monsterLawan);
                     updateMonsterList();
-                    updateGoldLabel();
                     JOptionPane.showMessageDialog(frame, monsterName + " telah ditambahkan ke koleksi monster Anda!");
                 }
             }
+            
             cardLayout.show(mainPanel, "Homebase");
         }
         String actionString = getActionString(action);
@@ -706,6 +751,7 @@ public class UI {
         enemyActionLabel.setText("Enemy Action: " + enemyAction);
     }
 
+   
     public static void main(String[] args) {
         SwingUtilities.invokeLater(UI::new);
     }
