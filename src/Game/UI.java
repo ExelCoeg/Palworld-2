@@ -546,7 +546,7 @@ public class UI {
         actionPanel.add(useHealthPotionButton);
     
         JButton useDamagePotionButton = new JButton("Use Damage Potion");
-        useDamagePotionButton.addActionListener(e -> useDamagePotion());
+        useDamagePotionButton.addActionListener(e -> useDamagePotion(monsterLawan));
         actionPanel.add(useDamagePotionButton);
     
         JPanel containerPanel = new JPanel(new BorderLayout());
