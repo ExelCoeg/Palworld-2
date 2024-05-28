@@ -246,7 +246,7 @@ public class UI {
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
         // Load the button background image
-        ImageIcon buttonIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Button_wood_texture.png");
+        ImageIcon buttonIcon = new ImageIcon("Button_wood_texture.png");
         Dimension buttonSize = new Dimension(200, 50);  // Adjusted button size
 
         // Add the welcome label
