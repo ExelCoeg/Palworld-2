@@ -11,7 +11,7 @@ import javax.swing.*;
 public class UI {
     private CardLayout cardLayout;
     private JFrame frame;
-    private JPanel mainPanel;
+    private JPanel mainPanel,monsterInfoPanel,monsterInfoPanel2;
     private JLabel playerMonsterHpLabel,enemyMonsterHpLabel, playerActionLabel, enemyActionLabel,stopwatchLabel, playerMonsterInfoLabel, enemyMonsterInfoLabel,potionLabel,goldLabel, homebaseLabel;
     private JTextArea dungeonInfo;
     private Monster monsterDipilih,monsterLawan;
@@ -22,7 +22,7 @@ public class UI {
 
     private DefaultListModel<String> monsterListModel;
 
-    int width = 600, height = 425;
+    int width = 600, height = 440;
 
     public UI() {
         createUI();
@@ -32,7 +32,7 @@ public class UI {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(width, height);
-        frame.setResizable(false);
+        frame.setResizable(true);
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
@@ -127,6 +127,22 @@ public class UI {
             selectMonsterForBattle();
             randomMonsterLawan(monsterDipilih);
             updateDungeonPanel();
+                // Get the path to the monster image
+            String monsterImagePath = getMonsterImagePath(monsterDipilih);
+            String monsterenemy=getMonsterImagePath(monsterLawan);
+            if (monsterImagePath != null) {
+                // Create a JLabel for the monster image
+                JLabel monsterImageLabel = new JLabel(new ImageIcon(monsterImagePath), JLabel.CENTER);
+
+                monsterInfoPanel.add(monsterImageLabel, BorderLayout.WEST); // Add monster image label above other components
+
+            }
+            if(monsterenemy != null){
+                JLabel monsterImageLabel2 = new JLabel(new ImageIcon(monsterenemy), JLabel.CENTER);
+            monsterInfoPanel2.add(monsterImageLabel2, BorderLayout.EAST); // Add monster image label above other components
+            }
+            
+
             dungeonInfo.append("Anda bertemu dengan " + monsterLawan.getName() + "!\n");
             int result = JOptionPane.showConfirmDialog(frame, "Anda bertemu dengan " + monsterLawan.getName() + ". Apakah Anda ingin bertarung?", "Encounter", JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
@@ -476,7 +492,7 @@ public class UI {
         buyItemButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
         buyItemButton.setForeground(Color.WHITE);
         buyItemButton.addActionListener(e -> {
-            mainPanel.add(BuyPotion(), "BuyItem");
+            mainPanel.add(createBuyItemPanel(), "BuyItem");
             cardLayout.show(mainPanel, "BuyItem");
         });
         buyItemPanel.add(buyItemButton);
@@ -549,17 +565,137 @@ public class UI {
     
         return mainPanel;
     }
-    private JPanel BuyPotion() {// Create the panel for buying potions
+    
+    private JPanel createBuyItemPanel() {
+        // Create the main panel with BorderLayout
+        JPanel panel = new JPanel(new BorderLayout());
+    
+        // Load and set the background image
+        ImageIcon backgroundIcon = new ImageIcon("Background_shop.png");
+        JLabel backgroundLabel = new JLabel(backgroundIcon);
+        panel.add(backgroundLabel);
+        backgroundLabel.setLayout(new BorderLayout());
+    
+        // Create a sub-panel for the content
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setOpaque(false);
+    
+        // Create and add the title label
+        JLabel title = new JLabel("Welcome to the Potion Shop!", JLabel.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(Color.black);
+        contentPanel.add(title, BorderLayout.NORTH);
+    
+        // Create and add the gold label
+        goldLabel = new JLabel("Gold: " + player.getGold(), JLabel.CENTER);
+        goldLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        goldLabel.setForeground(Color.black);
+        contentPanel.add(goldLabel, BorderLayout.SOUTH);
+    
+        // Create a panel for the potion buttons and labels
+        JPanel potionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        potionPanel.setOpaque(false);
+    
+        // Load the button background image
+        ImageIcon buttonIcon = new ImageIcon("Button_wood_texture.png");
+    
+        // Define different dimensions for the buttons
+        Dimension healthButtonSize = new Dimension(150, 40);
+        Dimension damageButtonSize = new Dimension(180, 45);
+        Dimension homeBaseButtonSize = new Dimension(200, 50);
+    
+        // Create the buttons and labels
+        JButton healthPotionButton = createButton("<html><center>Buy<br>Health<br>Potion</center></html>", buttonIcon, healthButtonSize);
+        JButton damagePotionButton = createButton("<html><center>Buy<br>Damage<br>Potion</center></html>", buttonIcon, damageButtonSize);
+        JLabel healthPotionLabel = createLabel("Price: 50 Gold");
+        JLabel damagePotionLabel = createLabel("Price: 75 Gold");
+    
+        // Add the buttons and labels to the potion panel
+        potionPanel.add(healthPotionLabel);
+        potionPanel.add(healthPotionButton);
+        potionPanel.add(damagePotionLabel);
+        potionPanel.add(damagePotionButton);
+    
+        // Add the potion panel to the content panel
+        contentPanel.add(potionPanel, BorderLayout.CENTER);
+    
+        // Create and add the output area
+        JTextArea outputArea = new JTextArea(5, 20);
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        contentPanel.add(scrollPane, BorderLayout.EAST);
+    
+        // Create the return button
+        JButton homeBaseButton = createButton("Return to Home Base", buttonIcon, homeBaseButtonSize);
+        homeBaseButton.addActionListener(e -> cardLayout.show(mainPanel, "Homebase"));
+        contentPanel.add(homeBaseButton, BorderLayout.WEST);
+    
+        // Add action listeners to the potion buttons
+        healthPotionButton.addActionListener(e -> {
+            if (player.getGold() >= 50) {
+                player.addGold(-50);
+                outputArea.append("Health Potion bought for 50 Gold.\n");
+                updateGoldLabel();
+            } else {
+                outputArea.append("Not enough gold to buy Health Potion!\n");
+            }
+        });
+    
+        damagePotionButton.addActionListener(e -> {
+            if (player.getGold() >= 75) {
+                player.addGold(-75);
+                outputArea.append("Damage Potion bought for 75 Gold.\n");
+                updateGoldLabel();
+            } else {
+                outputArea.append("Not enough gold to buy Damage Potion!\n");
+            }
+        });
+    
+        // Add the content panel to the center of the background label
+        backgroundLabel.add(contentPanel, BorderLayout.CENTER);
+    
+        return panel;
+    }
+    
+    private JButton createButton(String text, ImageIcon icon, Dimension size) {
+        JButton button = new JButton(text, icon);
+        button.setFont(new Font("Arial", Font.BOLD, 16));
+        button.setForeground(Color.WHITE);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setPreferredSize(size);
+        button.setMaximumSize(size);
+        button.setHorizontalTextPosition(JButton.CENTER);
+        button.setVerticalTextPosition(JButton.CENTER);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        return button;
+    }
+    
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text, JLabel.CENTER);
+        label.setFont(new Font("Arial", Font.BOLD, 12));
+        label.setForeground(Color.black);
+        return label;
+    }
+    
+    private JPanel BuyPotion() {
         JPanel panel = new JPanel(new BorderLayout());
 
         JLabel title = new JLabel("Welcome to the Potion Shop!", JLabel.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 16));
         panel.add(title, BorderLayout.NORTH);
 
+        ImageIcon backgroundIcon = new ImageIcon("Background_homebase.png");
+        JLabel backgroundLabel = new JLabel(backgroundIcon);
+        panel.add(backgroundLabel);
+        backgroundLabel.setLayout(new BorderLayout());
+
         goldLabel = new JLabel("Gold: " + player.getGold(), JLabel.CENTER); // Inisialisasi goldLabel dengan nilai awal
         panel.add(goldLabel, BorderLayout.SOUTH);
 
         JPanel potionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        potionPanel.setOpaque(false);
     
         JButton healthPotionButton = new JButton("Buy Health Potion");
         JButton damagePotionButton = new JButton("Buy Damage Potion");
@@ -623,36 +759,80 @@ public class UI {
     private void updateGoldLabel() {// Update the gold label with the player's current gold amount
         goldLabel.setText("Gold: " + player.getGold());
     }
-    private JPanel createDungeonPanel() {// Create the dungeon panel
+    @SuppressWarnings("removal")
+    private JPanel createDungeonPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        
+        // Load the background image
+        ImageIcon backgroundImage = new ImageIcon("Background_dungeon.png");
+        JLabel backgroundLabel = new JLabel(backgroundImage);
+        
+        // Set the size of the background label
+        backgroundLabel.setSize(backgroundImage.getIconWidth(), backgroundImage.getIconHeight());
+        
+        // Create a JLayeredPane to hold the background image and other components
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(backgroundImage.getIconWidth(), backgroundImage.getIconHeight()));
+        
+        // Add the background image to the lowest layer
+        layeredPane.add(backgroundLabel, new Integer(0));
+        
+        // Create a panel to hold other components
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setOpaque(false); // Make the panel transparent
+    
         JLabel dungeonLabel = new JLabel("Selamat datang di Dungeon!", JLabel.CENTER);
-        panel.add(dungeonLabel, BorderLayout.NORTH);
+        dungeonLabel.setForeground(Color.WHITE); // Set text color to make it visible on the background
+        mainPanel.add(dungeonLabel, BorderLayout.NORTH);
     
         dungeonInfo = new JTextArea();
         dungeonInfo.setEditable(false);
-        panel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
+        mainPanel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
     
         JPanel statusPanel = new JPanel(new GridLayout(3, 1));
+        statusPanel.setOpaque(false); // Make the panel transparent
         playerMonsterHpLabel = new JLabel("Player HP: 100", JLabel.CENTER);
+        playerMonsterHpLabel.setForeground(Color.WHITE);
+        playerMonsterHpLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 20));
         enemyMonsterHpLabel = new JLabel("Enemy HP: 100", JLabel.CENTER);
+        enemyMonsterHpLabel.setForeground(Color.WHITE);
+        enemyMonsterHpLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 20));
         playerActionLabel = new JLabel("Player Action: ", JLabel.CENTER);
+        playerActionLabel.setForeground(Color.WHITE);
+        playerActionLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
         enemyActionLabel = new JLabel("Enemy Action: ", JLabel.CENTER);
+        enemyActionLabel.setForeground(Color.WHITE);
+        enemyActionLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
         statusPanel.add(playerMonsterHpLabel);
         statusPanel.add(enemyMonsterHpLabel);
         statusPanel.add(playerActionLabel);
         statusPanel.add(enemyActionLabel);
     
-        panel.add(statusPanel, BorderLayout.SOUTH);
-    
-        JPanel monsterInfoPanel = new JPanel(new GridLayout(2, 1));
+        mainPanel.add(statusPanel, BorderLayout.SOUTH);
+        monsterInfoPanel2 = new JPanel(new BorderLayout());
+        monsterInfoPanel2.setOpaque(false); // Make the panel transpare
+        monsterInfoPanel = new JPanel(new BorderLayout());
+        monsterInfoPanel.setOpaque(false); // Make the panel transparent
         playerMonsterInfoLabel = new JLabel("Player Monster: ", JLabel.CENTER);
+        playerMonsterInfoLabel.setForeground(Color.WHITE);
+        playerMonsterInfoLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
         enemyMonsterInfoLabel = new JLabel("Enemy Monster: ", JLabel.CENTER);
-        monsterInfoPanel.add(playerMonsterInfoLabel);
-        monsterInfoPanel.add(enemyMonsterInfoLabel);
+        enemyMonsterInfoLabel.setForeground(Color.WHITE);
+        enemyMonsterInfoLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
     
-        panel.add(monsterInfoPanel, BorderLayout.CENTER);
+    
+        
+    
+        monsterInfoPanel.add(playerMonsterInfoLabel, BorderLayout.CENTER);
+        
+        monsterInfoPanel2.add(enemyMonsterInfoLabel, BorderLayout.SOUTH);
+    
+        mainPanel.add(monsterInfoPanel, BorderLayout.CENTER);
+        mainPanel.add(monsterInfoPanel2, BorderLayout.SOUTH);
+
     
         JPanel actionPanel = new JPanel(new GridLayout(1, 5)); // Adjusted grid layout to accommodate more buttons
+        actionPanel.setOpaque(false); // Make the panel transparent
     
         JButton basicAttackButton = new JButton("Basic Attack");
         basicAttackButton.addActionListener(e -> playerAction(1));
@@ -695,13 +875,39 @@ public class UI {
         actionPanel.add(useDamagePotionButton);
     
         JPanel containerPanel = new JPanel(new BorderLayout());
+        containerPanel.setOpaque(false); // Make the panel transparent
         containerPanel.add(actionPanel, BorderLayout.NORTH);
     
-        panel.add(containerPanel, BorderLayout.NORTH);
+        mainPanel.add(containerPanel, BorderLayout.NORTH);
+    
+        // Add the main panel to the layered pane
+        mainPanel.setBounds(0, 0, backgroundImage.getIconWidth(), backgroundImage.getIconHeight());
+        layeredPane.add(mainPanel, new Integer(1));
+    
+        // Add the layered pane to the main panel
+        panel.add(layeredPane, BorderLayout.CENTER);
     
         return panel;
     }
-    private Potion searchHealthPotion(){// Search for a health potion in the player's inventory
+//air api es tanah angin
+    private String getMonsterImagePath(Monster monster) {
+        switch (monster.getElemen()) {
+            case API:
+                return "monster_api.png";
+            case ANGIN:
+                return "monster_angin.png";
+            case TANAH:
+                return "monster_tanah.png";
+            case AIR:
+                return "monster_air.png";
+            case ES:
+                return "monster_es.png";
+            default:
+                return null;
+        }
+    }
+    
+    private Potion searchHealthPotion(){
         for(Potion potion : player.getPotions()){
             if(potion instanceof HealthPotion){
                 return potion;
