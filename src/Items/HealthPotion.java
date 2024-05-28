@@ -3,14 +3,14 @@ package Items;
 import Monsters.Monster;
 public class HealthPotion extends Potion {
     private final int healAmount = 25;
-
+    
     public int getHealAmount() {
         return this.healAmount;
     }
 
 
-    public HealthPotion(String name, int price) {
-        super(name, price);
+    public HealthPotion(int price) {
+        super(price);
     }
 
     @Override

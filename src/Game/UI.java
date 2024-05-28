@@ -235,7 +235,7 @@ public class UI {
         JPanel panel = new JPanel(new BorderLayout());
 
         // Load and set the background image
-        ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Background_homebase.png");
+        ImageIcon backgroundIcon = new ImageIcon("Background_homebase.png");
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         panel.add(backgroundLabel);
         backgroundLabel.setLayout(new BorderLayout());
@@ -246,7 +246,7 @@ public class UI {
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
         // Load the button background image
-        ImageIcon buttonIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Button_wood_texture.png");
+        ImageIcon buttonIcon = new ImageIcon("Button_wood_texture.png");
         Dimension buttonSize = new Dimension(200, 50);  // Adjusted button size
 
         // Add the welcome label
@@ -400,11 +400,11 @@ public class UI {
         layeredPane.setPreferredSize(new Dimension(600, 350)); // Set preferred size for the layered pane
     
         // Load the background image
-        ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Background_homebase.png");
+        ImageIcon backgroundIcon = new ImageIcon("Background_homebase.png");
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(), backgroundIcon.getIconHeight());
 
-        ImageIcon buttonIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Button_wood_texture.png");
+        ImageIcon buttonIcon = new ImageIcon("Button_wood_texture.png");
     
         // Create a panel for the buttons and other components
         JPanel panel = new JPanel();
