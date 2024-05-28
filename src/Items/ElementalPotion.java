@@ -5,8 +5,8 @@ import Monsters.Monster;
 public class ElementalPotion extends Potion {
     private final int damageAmount = 25;
 
-    public ElementalPotion(String name, int price) {
-        super(name, price);
+    public ElementalPotion(int price) {
+        super(price);
     }
 
     @Override

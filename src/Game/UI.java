@@ -462,6 +462,7 @@ public class UI {
             public void actionPerformed(ActionEvent e) {
                 if (player.getGold() >= 50) {
                     player.addGold(-50);
+                    player.addPotion(new HealthPotion());
                     outputArea.append("Health Potion bought for 50 Gold.\n");
                     updateGoldLabel();
                 } else {
@@ -542,12 +543,34 @@ public class UI {
         actionPanel.add(elementalAttackButton);
     
         JButton useHealthPotionButton = new JButton("Use Health Potion");
-        useHealthPotionButton.addActionListener(e -> useHealthPotion());
+        useHealthPotionButton.addActionListener(e -> {
+            System.out.println(searchHealthPotion());
+            System.out.println(player.getPotions());
+            if(searchHealthPotion() == null){
+                JOptionPane.showMessageDialog(frame, "Tidak ada Health Potion yang tersedia!");
+            }
+            else{
+                useHealthPotion();
+                JOptionPane.showMessageDialog(frame, "Telah menggunakan Health Potion!");
+                updateHpLabels(); 
+            }
+        });
         actionPanel.add(useHealthPotionButton);
-    
-        JButton useDamagePotionButton = new JButton("Use Damage Potion");
-        useDamagePotionButton.addActionListener(e -> useDamagePotion(monsterLawan));
-        actionPanel.add(useDamagePotionButton);
+        
+        JButton useElementalPotionButton = new JButton("Use Elemental Potion");
+        useElementalPotionButton.addActionListener(e -> {
+            
+            System.out.println(searchElementalPotion());
+            if(searchElementalPotion() == null){
+                JOptionPane.showMessageDialog(frame, "Tidak ada Elemental Potion yang tersedia!");
+            }
+            else{
+                useElementalPotion(monsterLawan);
+                JOptionPane.showMessageDialog(frame, "Telah menggunakan Elemental Potion!");
+                updateHpLabels(); 
+            }
+        });
+        actionPanel.add(useElementalPotionButton);
     
         JPanel containerPanel = new JPanel(new BorderLayout());
         containerPanel.add(actionPanel, BorderLayout.NORTH);
@@ -556,6 +579,7 @@ public class UI {
     
         return panel;
     }
+
     private Potion searchHealthPotion(){
         for(Potion potion : player.getPotions()){
             if(potion instanceof HealthPotion){
@@ -564,7 +588,8 @@ public class UI {
         }
         return null;
     }
-    private Potion searchDamagePotion(){
+
+    private Potion searchElementalPotion(){
         for(Potion potion : player.getPotions()){
             if(potion instanceof ElementalPotion){
                 return potion;
@@ -576,16 +601,9 @@ public class UI {
         player.usePotion(searchHealthPotion(), monsterDipilih);
     }
     
-    private void useDamagePotion(Monster enemy) {
-         player.usePotion(searchDamagePotion(), monsterLawan);
+    private void useElementalPotion(Monster enemy) {
+         player.usePotion(searchElementalPotion(), monsterLawan);
     }
-    private void updatePlayerStatus() {
-        playerMonsterHpLabel.setText("Player HP: " + player.monsters.get(0).getHp());
-    }
-    
-    private void updateEnemyStatus() {
-    }
-
 
     private void chooseMonstersForDungeon() {
         JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -597,7 +615,7 @@ public class UI {
             checkboxes[i] = new JCheckBox(monster.getName());
             panel.add(checkboxes[i]);
         }
-    
+        
         int result = JOptionPane.showConfirmDialog(frame, panel, "Pilih Monster", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             ArrayList<Monster> selectedMonsters = new ArrayList<>();
@@ -616,7 +634,7 @@ public class UI {
                 JOptionPane.showMessageDialog(frame, "Anda membawa " + selectedMonsters.size() + " monster ke dungeon.");
                 
                 try{
-                    startAdventure(); // Mulai petualangan setelah memilih monster
+                    startAdventure();
                 }
                 catch (PalworldException e){
                     JOptionPane.showMessageDialog(frame, e.getMessage());
@@ -708,7 +726,6 @@ public class UI {
             default -> dungeonInfo.append("Pilihan tidak valid!\n");
         }
     
-        updateHpLabels();
         int randomAction = new Random().nextInt(3); 
         enemyAction(randomAction); 
         updateHpLabels(); 
