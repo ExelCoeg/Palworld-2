@@ -1,5 +1,4 @@
 package Game;
-
 import Items.*;
 import Monsters.*;
 import java.awt.*;
@@ -23,13 +22,11 @@ public class UI {
 
     private DefaultListModel<String> monsterListModel;
 
-    private GameState gameState = new GameState();
     int width = 600, height = 425;
 
     public UI() {
         createUI();
     }
-
     public void createUI() { // Create the main frame and add the main panel with CardLayout
         frame = new JFrame("Palworld Game");
 
@@ -98,8 +95,6 @@ public class UI {
         
         adventureTimer.start();
     }
-    
-
     private String getRandomMovementText() {// Get a random movement text for the adventure panel
         Random random = new Random();
         int direction = random.nextInt(4);
@@ -120,15 +115,12 @@ public class UI {
         }
         return movementText;
     }
-    
-    
     private void stopAdventure() {// Stop the adventure by stopping the timer and showing the homebase panel
         if (adventureTimer != null) {
             adventureTimer.stop();
         }
         cardLayout.show(mainPanel, "Homebase");
     }
-    
     private void encounterMonster() throws PalworldException {// Encounter a monster during the adventure
         try {
             adventureTimer.stop(); 
@@ -229,7 +221,6 @@ public class UI {
         }
         return panel;
     }
-
     private JPanel createMainMenuPanel() {// Create the main menu panel
         // Create the main panel with BorderLayout
         JPanel panel = new JPanel(new BorderLayout());
@@ -345,7 +336,6 @@ public class UI {
 
         return panel;
     }
-
     private JPanel createNewGamePanel() {// Create the new game panel
         JPanel panel = new JPanel(new BorderLayout());
         JLabel nameLabel = new JLabel("Masukkan nama player: ", JLabel.CENTER);
@@ -381,7 +371,6 @@ public class UI {
         playerMonsterInfoLabel.setText("Player Monster: " + (monsterDipilih != null ? monsterDipilih.getName() + " (HP: " + monsterDipilih.getHp() + ")" : "N/A"));
         enemyMonsterInfoLabel.setText("Enemy Monster: " + (monsterLawan != null ? monsterLawan.getName() + " (HP: " + monsterLawan.getHp() + ")" : "N/A"));
     }
-
     private void checkLevelUp(Monster monster) {// Check if the monster has leveled up and update its stats
         while (monster.getExp() >= 100) {
             monster.setExp(monster.getExp() - 100);
@@ -560,8 +549,6 @@ public class UI {
     
         return mainPanel;
     }
-    
-    
     private JPanel BuyPotion() {// Create the panel for buying potions
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -733,11 +720,9 @@ public class UI {
     private void useHealthPotion() {// Use a health potion to heal the player's monster
         player.usePotion(searchHealthPotion(), monsterDipilih);
     }
-    
     private void useDamagePotion(Monster enemy) {// Use a damage potion to attack the enemy monster
          player.usePotion(searchDamagePotion(), monsterLawan);
     }
-
     private void chooseMonstersForDungeon() {// Choose monsters to bring to the dungeon
         JPanel panel = new JPanel(new GridLayout(0, 1));
         panel.add(new JLabel("Pilih hingga 3 monster untuk dibawa ke dungeon:"));
@@ -775,7 +760,6 @@ public class UI {
             }
         }
     }
-
     private JPanel createManageMonstersPanel() {// Create the panel for managing monsters
      
         JPanel panel = new JPanel(new BorderLayout());
@@ -901,7 +885,6 @@ public class UI {
         String actionString = getActionString(action);
         updateActionLabels(actionString, "");
 }
-    
     private void enemyAction(int action) {// Enemy action during the battle
         switch (action) {
             case 0 -> {
@@ -924,7 +907,6 @@ public class UI {
         String actionString = getActionString(action); 
         updateActionLabels("", actionString);
     }
-    
     private String getActionString(int action) {// Get the action string based on the action number
         switch (action) {
             case 1:
@@ -937,18 +919,14 @@ public class UI {
                 return "Invalid Action";
         }
     }
-
     private void updateHpLabels() {// Update the HP labels with the current HP of the monsters
         playerMonsterHpLabel.setText("Player HP: " + monsterDipilih.getHp());
         enemyMonsterHpLabel.setText("Enemy HP: " + monsterLawan.getHp());
     }
-
     private void updateActionLabels(String playerAction, String enemyAction) {// Update the action labels with the current actions
         playerActionLabel.setText("Player Action: " + playerAction);
         enemyActionLabel.setText("Enemy Action: " + enemyAction);
     }
-
-   
     public static void main(String[] args) {
         SwingUtilities.invokeLater(UI::new);
     }
