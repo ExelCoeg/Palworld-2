@@ -104,6 +104,7 @@ public abstract class Monster implements Serializable{
     public void Escape(){
         System.out.println("Monster mencoba kabur");
     }
+    
     public void Heal(){
         this.hp = 100;
     }

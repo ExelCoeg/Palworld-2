@@ -1,6 +1,6 @@
 package Game;
 
-import Items.Potion;
+import Items.*;
 import Monsters.*;
 import java.util.*;
 
@@ -55,17 +55,22 @@ public class Player {
     public void addPotion(Potion potion) {
         this.potions.add(potion);
     }
-
-    public boolean usePotion(Class<? extends Potion> potionClass, Monster enemy) {
-        for (Potion potion : potions) {
-            if (potionClass.isInstance(potion)) {
-                potion.useItem(this, enemy);
-                potions.remove(potion);
-                return true;
-            }
-        }
-        return false;
+    public void removePotion(Potion potion){
+        this.potions.remove(potion);
     }
+    public void usePotion(Potion potion, Monster monster){
+        if(potion instanceof ElementalPotion elementalPotion){
+            elementalPotion.useItem(monster);
+        }
+        else if (potion instanceof HealthPotion healthPotion){
+            healthPotion.useItem(monster);
+        }
+    }
+    
+        
+
+    
+    
 
     public void printMonsters() {
         System.out.println();

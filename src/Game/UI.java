@@ -45,7 +45,6 @@ public class UI {
         mainPanel.add(createChooseMonsterPanel(), "ChooseMonster");
         mainPanel.add(createDungeonPanel(), "Dungeon");
         mainPanel.add(createManageMonstersPanel(), "ManageMonsters");
-        // mainPanel.add(BuyPotion(), "BuyItem");
 
         frame.add(mainPanel);
         frame.setVisible(true);
@@ -557,20 +556,28 @@ public class UI {
     
         return panel;
     }
-    
-    private void useHealthPotion() {
-        if (player.usePotion(HealthPotion.class, null)) {
-            dungeonInfo.append("Used a Health Potion. Player health increased.\n");
-            updatePlayerStatus();
-        } else {
-            dungeonInfo.append("No Health Potions available.\n");
+    private Potion searchHealthPotion(){
+        for(Potion potion : player.getPotions()){
+            if(potion instanceof HealthPotion){
+                return potion;
+            }
         }
+        return null;
     }
-    private void useDamagePotion() {
-       
-        if (player.usePotion(ElementalPotion.class, null)) {
-            dungeonInfo.append("No Damage Potions available.\n");
+    private Potion searchDamagePotion(){
+        for(Potion potion : player.getPotions()){
+            if(potion instanceof ElementalPotion){
+                return potion;
+            }
         }
+        return null;
+    }
+    private void useHealthPotion() {
+        player.usePotion(searchHealthPotion(), monsterDipilih);
+    }
+    
+    private void useDamagePotion(Monster enemy) {
+         player.usePotion(searchDamagePotion(), monsterLawan);
     }
     private void updatePlayerStatus() {
         playerMonsterHpLabel.setText("Player HP: " + player.monsters.get(0).getHp());

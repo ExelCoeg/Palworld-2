@@ -1,8 +1,5 @@
 package Items;
-
-import Game.Player;
 import Monsters.Monster;
-
 public abstract class Potion {
     public String name;
     public int price;
@@ -12,5 +9,6 @@ public abstract class Potion {
         this.price = price;
     }
 
-    public abstract void useItem(Player player, Monster enemy);
+    public abstract void useItem(Monster monster);
+
 }
