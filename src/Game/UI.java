@@ -492,7 +492,7 @@ public class UI {
         buyItemButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
         buyItemButton.setForeground(Color.WHITE);
         buyItemButton.addActionListener(e -> {
-            mainPanel.add(BuyPotion(), "BuyItem");
+            mainPanel.add(createBuyItemPanel(), "BuyItem");
             cardLayout.show(mainPanel, "BuyItem");
         });
         buyItemPanel.add(buyItemButton);
@@ -566,6 +566,125 @@ public class UI {
         return mainPanel;
     }
     
+    private JPanel createBuyItemPanel() {
+        // Create the main panel with BorderLayout
+        JPanel panel = new JPanel(new BorderLayout());
+    
+        // Load and set the background image
+        ImageIcon backgroundIcon = new ImageIcon("Background_shop.png");
+        JLabel backgroundLabel = new JLabel(backgroundIcon);
+        panel.add(backgroundLabel);
+        backgroundLabel.setLayout(new BorderLayout());
+    
+        // Create a sub-panel for the content
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setOpaque(false);
+    
+        // Create and add the title label
+        JLabel title = new JLabel("Welcome to the Potion Shop!", JLabel.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 16));
+        title.setForeground(Color.black);
+        contentPanel.add(title, BorderLayout.NORTH);
+    
+        // Create and add the gold label
+        goldLabel = new JLabel("Gold: " + player.getGold(), JLabel.CENTER);
+        goldLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        goldLabel.setForeground(Color.black);
+        contentPanel.add(goldLabel, BorderLayout.SOUTH);
+    
+        // Create a panel for the potion buttons and labels
+        JPanel potionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        potionPanel.setOpaque(false);
+    
+        // Load the button background image
+        ImageIcon buttonIcon = new ImageIcon("Button_wood_texture.png");
+    
+        // Define different dimensions for the buttons
+        Dimension healthButtonSize = new Dimension(150, 40);
+        Dimension damageButtonSize = new Dimension(180, 45);
+        Dimension homeBaseButtonSize = new Dimension(200, 50);
+    
+        // Create the buttons and labels
+        JButton healthPotionButton = createButton("<html><center>Buy<br>Health<br>Potion</center></html>", buttonIcon, healthButtonSize);
+        JButton damagePotionButton = createButton("<html><center>Buy<br>Damage<br>Potion</center></html>", buttonIcon, damageButtonSize);
+        JLabel healthPotionLabel = createLabel("Price: 50 Gold");
+        JLabel damagePotionLabel = createLabel("Price: 75 Gold");
+    
+        // Add the buttons and labels to the potion panel
+        potionPanel.add(healthPotionLabel);
+        potionPanel.add(healthPotionButton);
+        potionPanel.add(damagePotionLabel);
+        potionPanel.add(damagePotionButton);
+    
+        // Add the potion panel to the content panel
+        contentPanel.add(potionPanel, BorderLayout.CENTER);
+    
+        // Create and add the output area
+        JTextArea outputArea = new JTextArea(5, 20);
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        contentPanel.add(scrollPane, BorderLayout.EAST);
+    
+        // Create the return button
+        JButton homeBaseButton = createButton("Return to Home Base", buttonIcon, homeBaseButtonSize);
+        homeBaseButton.addActionListener(e -> cardLayout.show(mainPanel, "Homebase"));
+        contentPanel.add(homeBaseButton, BorderLayout.WEST);
+    
+        // Add action listeners to the potion buttons
+        healthPotionButton.addActionListener(e -> {
+            if (player.getGold() >= 50) {
+                player.addGold(-50);
+                outputArea.append("Health Potion bought for 50 Gold.\n");
+                updateGoldLabel();
+            } else {
+                outputArea.append("Not enough gold to buy Health Potion!\n");
+            }
+        });
+    
+        damagePotionButton.addActionListener(e -> {
+            if (player.getGold() >= 75) {
+                player.addGold(-75);
+                outputArea.append("Damage Potion bought for 75 Gold.\n");
+                updateGoldLabel();
+            } else {
+                outputArea.append("Not enough gold to buy Damage Potion!\n");
+            }
+        });
+    
+        // Add the content panel to the center of the background label
+        backgroundLabel.add(contentPanel, BorderLayout.CENTER);
+    
+        return panel;
+    }
+    
+    private JButton createButton(String text, ImageIcon icon, Dimension size) {
+        JButton button = new JButton(text, icon);
+        button.setFont(new Font("Arial", Font.BOLD, 16));
+        button.setForeground(Color.WHITE);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setPreferredSize(size);
+        button.setMaximumSize(size);
+        button.setHorizontalTextPosition(JButton.CENTER);
+        button.setVerticalTextPosition(JButton.CENTER);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        return button;
+    }
+    
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text, JLabel.CENTER);
+        label.setFont(new Font("Arial", Font.BOLD, 12));
+        label.setForeground(Color.black);
+        return label;
+    }
+    
+    private void updateGoldLabel() {
+        goldLabel.setText("Gold: " + player.getGold());
+    }
+    
+    
+    
     
     private JPanel BuyPotion() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -574,10 +693,16 @@ public class UI {
         title.setFont(new Font("Arial", Font.BOLD, 16));
         panel.add(title, BorderLayout.NORTH);
 
+        ImageIcon backgroundIcon = new ImageIcon("Background_homebase.png");
+        JLabel backgroundLabel = new JLabel(backgroundIcon);
+        panel.add(backgroundLabel);
+        backgroundLabel.setLayout(new BorderLayout());
+
         goldLabel = new JLabel("Gold: " + player.getGold(), JLabel.CENTER); // Inisialisasi goldLabel dengan nilai awal
         panel.add(goldLabel, BorderLayout.SOUTH);
 
         JPanel potionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        potionPanel.setOpaque(false);
     
         JButton healthPotionButton = new JButton("Buy Health Potion");
         JButton damagePotionButton = new JButton("Buy Damage Potion");
