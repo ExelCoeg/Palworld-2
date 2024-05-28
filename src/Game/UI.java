@@ -12,7 +12,7 @@ import javax.swing.*;
 public class UI {
     private CardLayout cardLayout;
     private JFrame frame;
-    private JPanel mainPanel;
+    private JPanel mainPanel,monsterInfoPanel,monsterInfoPanel2;
     private JLabel playerMonsterHpLabel,enemyMonsterHpLabel, playerActionLabel, enemyActionLabel,stopwatchLabel, playerMonsterInfoLabel, enemyMonsterInfoLabel,potionLabel,goldLabel, homebaseLabel;
     private JTextArea dungeonInfo;
     private Monster monsterDipilih,monsterLawan;
@@ -35,7 +35,7 @@ public class UI {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(width, height);
-        frame.setResizable(false);
+        frame.setResizable(true);
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
@@ -135,6 +135,22 @@ public class UI {
             selectMonsterForBattle();
             randomMonsterLawan(monsterDipilih);
             updateDungeonPanel();
+                // Get the path to the monster image
+            String monsterImagePath = getMonsterImagePath(monsterDipilih);
+            String monsterenemy=getMonsterImagePath(monsterLawan);
+            if (monsterImagePath != null) {
+                // Create a JLabel for the monster image
+                JLabel monsterImageLabel = new JLabel(new ImageIcon(monsterImagePath), JLabel.CENTER);
+
+                monsterInfoPanel.add(monsterImageLabel, BorderLayout.WEST); // Add monster image label above other components
+
+            }
+            if(monsterenemy != null){
+                JLabel monsterImageLabel2 = new JLabel(new ImageIcon(monsterenemy), JLabel.CENTER);
+            monsterInfoPanel2.add(monsterImageLabel2, BorderLayout.EAST); // Add monster image label above other components
+            }
+            
+
             dungeonInfo.append("Anda bertemu dengan " + monsterLawan.getName() + "!\n");
             int result = JOptionPane.showConfirmDialog(frame, "Anda bertemu dengan " + monsterLawan.getName() + ". Apakah Anda ingin bertarung?", "Encounter", JOptionPane.YES_NO_OPTION);
             if (result == JOptionPane.YES_OPTION) {
@@ -689,8 +705,9 @@ public class UI {
         statusPanel.add(enemyActionLabel);
     
         mainPanel.add(statusPanel, BorderLayout.SOUTH);
-    
-        JPanel monsterInfoPanel = new JPanel(new GridLayout(2, 1));
+        monsterInfoPanel2 = new JPanel(new BorderLayout());
+        monsterInfoPanel2.setOpaque(false); // Make the panel transpare
+        monsterInfoPanel = new JPanel(new BorderLayout());
         monsterInfoPanel.setOpaque(false); // Make the panel transparent
         playerMonsterInfoLabel = new JLabel("Player Monster: ", JLabel.CENTER);
         playerMonsterInfoLabel.setForeground(Color.WHITE);
@@ -698,10 +715,17 @@ public class UI {
         enemyMonsterInfoLabel = new JLabel("Enemy Monster: ", JLabel.CENTER);
         enemyMonsterInfoLabel.setForeground(Color.WHITE);
         enemyMonsterInfoLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
-        monsterInfoPanel.add(playerMonsterInfoLabel);
-        monsterInfoPanel.add(enemyMonsterInfoLabel);
+    
+    
+        
+    
+        monsterInfoPanel.add(playerMonsterInfoLabel, BorderLayout.CENTER);
+        
+        monsterInfoPanel2.add(enemyMonsterInfoLabel, BorderLayout.SOUTH);
     
         mainPanel.add(monsterInfoPanel, BorderLayout.CENTER);
+        mainPanel.add(monsterInfoPanel2, BorderLayout.SOUTH);
+
     
         JPanel actionPanel = new JPanel(new GridLayout(1, 5)); // Adjusted grid layout to accommodate more buttons
         actionPanel.setOpaque(false); // Make the panel transparent
@@ -740,6 +764,23 @@ public class UI {
         panel.add(layeredPane, BorderLayout.CENTER);
     
         return panel;
+    }
+//air api es tanah angin
+    private String getMonsterImagePath(Monster monster) {
+        switch (monster.getElemen()) {
+            case API:
+                return "monster_api.png";
+            case ANGIN:
+                return "monster_angin.png";
+            case TANAH:
+                return "monster_tanah.png";
+            case AIR:
+                return "monster_air";
+            case ES:
+                return "monster_es.png";
+            default:
+                return null;
+        }
     }
     
     private Potion searchHealthPotion(){
