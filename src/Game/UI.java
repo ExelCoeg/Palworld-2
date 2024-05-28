@@ -235,7 +235,7 @@ public class UI {
         JPanel panel = new JPanel(new BorderLayout());
 
         // Load and set the background image
-        ImageIcon backgroundIcon = new ImageIcon("Background_homebase.png");
+        ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Background_homebase.png");
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         panel.add(backgroundLabel);
         backgroundLabel.setLayout(new BorderLayout());
@@ -246,7 +246,7 @@ public class UI {
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 
         // Load the button background image
-        ImageIcon buttonIcon = new ImageIcon("Button_wood_texture.png");
+        ImageIcon buttonIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Button_wood_texture.png");
         Dimension buttonSize = new Dimension(200, 50);  // Adjusted button size
 
         // Add the welcome label
@@ -400,11 +400,11 @@ public class UI {
         layeredPane.setPreferredSize(new Dimension(600, 350)); // Set preferred size for the layered pane
     
         // Load the background image
-        ImageIcon backgroundIcon = new ImageIcon("Background_homebase.png");
+        ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Background_homebase.png");
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(), backgroundIcon.getIconHeight());
 
-        ImageIcon buttonIcon = new ImageIcon("Button_wood_texture.png");
+        ImageIcon buttonIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Button_wood_texture.png");
     
         // Create a panel for the buttons and other components
         JPanel panel = new JPanel();
@@ -639,36 +639,72 @@ public class UI {
     private void updateGoldLabel() {
         goldLabel.setText("Gold: " + player.getGold());
     }
+    @SuppressWarnings("removal")
     private JPanel createDungeonPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        
+        // Load the background image
+        ImageIcon backgroundImage = new ImageIcon("Background_dungeon.png");
+        JLabel backgroundLabel = new JLabel(backgroundImage);
+        
+        // Set the size of the background label
+        backgroundLabel.setSize(backgroundImage.getIconWidth(), backgroundImage.getIconHeight());
+        
+        // Create a JLayeredPane to hold the background image and other components
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(backgroundImage.getIconWidth(), backgroundImage.getIconHeight()));
+        
+        // Add the background image to the lowest layer
+        layeredPane.add(backgroundLabel, new Integer(0));
+        
+        // Create a panel to hold other components
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setOpaque(false); // Make the panel transparent
+    
         JLabel dungeonLabel = new JLabel("Selamat datang di Dungeon!", JLabel.CENTER);
-        panel.add(dungeonLabel, BorderLayout.NORTH);
+        dungeonLabel.setForeground(Color.WHITE); // Set text color to make it visible on the background
+        mainPanel.add(dungeonLabel, BorderLayout.NORTH);
     
         dungeonInfo = new JTextArea();
         dungeonInfo.setEditable(false);
-        panel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
+        mainPanel.add(new JScrollPane(dungeonInfo), BorderLayout.CENTER);
     
         JPanel statusPanel = new JPanel(new GridLayout(3, 1));
+        statusPanel.setOpaque(false); // Make the panel transparent
         playerMonsterHpLabel = new JLabel("Player HP: 100", JLabel.CENTER);
+        playerMonsterHpLabel.setForeground(Color.WHITE);
+        playerMonsterHpLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 20));
         enemyMonsterHpLabel = new JLabel("Enemy HP: 100", JLabel.CENTER);
+        enemyMonsterHpLabel.setForeground(Color.WHITE);
+        enemyMonsterHpLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 20));
         playerActionLabel = new JLabel("Player Action: ", JLabel.CENTER);
+        playerActionLabel.setForeground(Color.WHITE);
+        playerActionLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
         enemyActionLabel = new JLabel("Enemy Action: ", JLabel.CENTER);
+        enemyActionLabel.setForeground(Color.WHITE);
+        enemyActionLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
         statusPanel.add(playerMonsterHpLabel);
         statusPanel.add(enemyMonsterHpLabel);
         statusPanel.add(playerActionLabel);
         statusPanel.add(enemyActionLabel);
     
-        panel.add(statusPanel, BorderLayout.SOUTH);
+        mainPanel.add(statusPanel, BorderLayout.SOUTH);
     
         JPanel monsterInfoPanel = new JPanel(new GridLayout(2, 1));
+        monsterInfoPanel.setOpaque(false); // Make the panel transparent
         playerMonsterInfoLabel = new JLabel("Player Monster: ", JLabel.CENTER);
+        playerMonsterInfoLabel.setForeground(Color.WHITE);
+        playerMonsterInfoLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
         enemyMonsterInfoLabel = new JLabel("Enemy Monster: ", JLabel.CENTER);
+        enemyMonsterInfoLabel.setForeground(Color.WHITE);
+        enemyMonsterInfoLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
         monsterInfoPanel.add(playerMonsterInfoLabel);
         monsterInfoPanel.add(enemyMonsterInfoLabel);
     
-        panel.add(monsterInfoPanel, BorderLayout.CENTER);
+        mainPanel.add(monsterInfoPanel, BorderLayout.CENTER);
     
         JPanel actionPanel = new JPanel(new GridLayout(1, 5)); // Adjusted grid layout to accommodate more buttons
+        actionPanel.setOpaque(false); // Make the panel transparent
     
         JButton basicAttackButton = new JButton("Basic Attack");
         basicAttackButton.addActionListener(e -> playerAction(1));
@@ -691,12 +727,21 @@ public class UI {
         actionPanel.add(useDamagePotionButton);
     
         JPanel containerPanel = new JPanel(new BorderLayout());
+        containerPanel.setOpaque(false); // Make the panel transparent
         containerPanel.add(actionPanel, BorderLayout.NORTH);
     
-        panel.add(containerPanel, BorderLayout.NORTH);
+        mainPanel.add(containerPanel, BorderLayout.NORTH);
+    
+        // Add the main panel to the layered pane
+        mainPanel.setBounds(0, 0, backgroundImage.getIconWidth(), backgroundImage.getIconHeight());
+        layeredPane.add(mainPanel, new Integer(1));
+    
+        // Add the layered pane to the main panel
+        panel.add(layeredPane, BorderLayout.CENTER);
     
         return panel;
     }
+    
     private Potion searchHealthPotion(){
         for(Potion potion : player.getPotions()){
             if(potion instanceof HealthPotion){
