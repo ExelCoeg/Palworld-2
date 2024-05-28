@@ -24,7 +24,7 @@ public class UI {
     private DefaultListModel<String> monsterListModel;
 
     private GameState gameState = new GameState();
-    int width = 600, height = 400;
+    int width = 600, height = 425;
 
     public UI() {
         createUI();
@@ -209,7 +209,7 @@ public class UI {
         cardLayout.show(mainPanel, "Homebase");
     }
     private JPanel createChooseMonsterPanel(){
-        JPanel panel = new JPanel(new GridLayout(7, 1));
+        JPanel panel = new JPanel(new GridLayout(6, 1));
         JLabel instructions = new JLabel("Select your first monster:", JLabel.CENTER);
         panel.add(instructions);
         
@@ -231,60 +231,117 @@ public class UI {
     }
 
     private JPanel createMainMenuPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
+        // Create the main panel with BorderLayout
+        JPanel panel = new JPanel(new BorderLayout());
 
+        // Load and set the background image
+        ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Background_homebase.png");
+        JLabel backgroundLabel = new JLabel(backgroundIcon);
+        panel.add(backgroundLabel);
+        backgroundLabel.setLayout(new BorderLayout());
+
+        // Create a sub-panel for buttons with vertical alignment
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false);
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+
+        // Load the button background image
+        ImageIcon buttonIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Button_wood_texture.png");
+        Dimension buttonSize = new Dimension(200, 50);  // Adjusted button size
+
+        // Add the welcome label
         JLabel welcomeLabel = new JLabel("Selamat datang di Palworld!", JLabel.CENTER);
         welcomeLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 32));
-        welcomeLabel.setBounds(80, 50, 440, 50);
-        panel.add(welcomeLabel);
+        welcomeLabel.setForeground(Color.orange);
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        welcomeLabel.setMaximumSize(new Dimension(600, 50));  // Adjusted size
+        buttonPanel.add(Box.createVerticalStrut(20));  // Spacer
+        buttonPanel.add(welcomeLabel);
+        buttonPanel.add(Box.createVerticalStrut(30));  // Spacer
 
-        JButton newGameButton = new JButton("Start Game");
-        newGameButton.setBounds(250, 150, 100, 50);
+        // Add the new game button with text on top
+        JButton newGameButton = new JButton("Start Game", buttonIcon);
+        newGameButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 24));
+        newGameButton.setForeground(Color.WHITE);
+
+        newGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        newGameButton.setPreferredSize(buttonSize);
+        newGameButton.setMaximumSize(buttonSize);
+        newGameButton.setHorizontalTextPosition(JButton.CENTER);
+        newGameButton.setVerticalTextPosition(JButton.CENTER);
+        newGameButton.setContentAreaFilled(false);
+        newGameButton.setBorderPainted(false);
+        newGameButton.setFocusPainted(false);
         newGameButton.addActionListener(e -> cardLayout.show(mainPanel, "NewGame"));
-        panel.add(newGameButton);
+        buttonPanel.add(newGameButton);
+        buttonPanel.add(Box.createVerticalStrut(20));  // Spacer
 
-        JButton loadButton = new JButton("Load Game");
-        loadButton.setBounds(250, 220, 100, 50);
+        // Add the load game button with text on top
+        JButton loadButton = new JButton("Load Game", buttonIcon);
+        loadButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 24));
+        loadButton.setForeground(Color.WHITE);
+        
+        loadButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        loadButton.setPreferredSize(buttonSize);
+        loadButton.setMaximumSize(buttonSize);
+        loadButton.setHorizontalTextPosition(JButton.CENTER);
+        loadButton.setVerticalTextPosition(JButton.CENTER);
+        loadButton.setContentAreaFilled(false);
+        loadButton.setBorderPainted(false);
+        loadButton.setFocusPainted(false);
         loadButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String[] saveFiles = new File("src/Saves").list((dir, name) -> name.endsWith(".txt"));
-            if (saveFiles != null && saveFiles.length > 0) {
-                String selectedFile = (String) JOptionPane.showInputDialog(
-                    frame, 
-                    "Select a save file to load:", 
-                    "Load Game", 
-                    JOptionPane.PLAIN_MESSAGE, 
-                    null, 
-                    saveFiles, 
-                    saveFiles[0]
-                );
-                System.out.println(selectedFile);
-                if (selectedFile != null) {
-                    try {
-                        GameState loadedGameState = SaveAndLoad.loadGame(selectedFile);
-                        player.setName(loadedGameState.getPlayerName());
-                        player.setMonsters(loadedGameState.getMonsters());
-                        player.setPotions(loadedGameState.getPotions());
-                        mainPanel.add(createHomebasePanel(), "Homebase");
-                        cardLayout.show(mainPanel, "Homebase");
-                    } catch (IOException | ClassNotFoundException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(frame, "Failed to load the game!");
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String[] saveFiles = new File("src/Saves").list((dir, name) -> name.endsWith(".txt"));
+                if (saveFiles != null && saveFiles.length > 0) {
+                    String selectedFile = (String) JOptionPane.showInputDialog(
+                            frame,
+                            "Select a save file to load:",
+                            "Load Game",
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            saveFiles,
+                            saveFiles[0]
+                    );
+                    if (selectedFile != null) {
+                        try {
+                            GameState loadedGameState = SaveAndLoad.loadGame(selectedFile);
+                            player.setName(loadedGameState.getPlayerName());
+                            player.setMonsters(loadedGameState.getMonsters());
+                            player.setPotions(loadedGameState.getPotions());
+                            mainPanel.add(createHomebasePanel(), "Homebase");
+                            cardLayout.show(mainPanel, "Homebase");
+                        } catch (IOException | ClassNotFoundException ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(frame, "Failed to load the game!");
+                        }
                     }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "No save files found!");
                 }
-            } else {
-                JOptionPane.showMessageDialog(frame, "No save files found!");
             }
-        }
-    });
-        panel.add(loadButton);
+        });
+        buttonPanel.add(loadButton);
+        buttonPanel.add(Box.createVerticalStrut(20));  // Spacer
 
-        JButton exitButton = new JButton("Exit");
-        exitButton.setBounds(250, 290, 100, 50);
-        exitButton.addActionListener(e ->System.exit(0));
-        panel.add(exitButton);
+        // Add the exit button with text on top
+        JButton exitButton = new JButton("Exit", buttonIcon);
+        exitButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
+        exitButton.setForeground(Color.WHITE);
+        exitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        exitButton.setPreferredSize(buttonSize);
+        exitButton.setMaximumSize(buttonSize);
+        exitButton.setHorizontalTextPosition(JButton.CENTER);
+        exitButton.setVerticalTextPosition(JButton.CENTER);
+        exitButton.setContentAreaFilled(false);
+        exitButton.setBorderPainted(false);
+        exitButton.setFocusPainted(false);
+        exitButton.addActionListener(e -> System.exit(0));
+        buttonPanel.add(exitButton);
+        buttonPanel.add(Box.createVerticalStrut(20));  // Spacer
+
+        // Add the button panel to the center of the background label
+        backgroundLabel.add(buttonPanel, BorderLayout.CENTER);
 
         return panel;
     }
@@ -338,12 +395,42 @@ public class UI {
         homebaseLabel.setText("Selamat datang di Palworld! " + playerName);
     }
     private JPanel createHomebasePanel() {
-        JPanel panel = new JPanel(new GridLayout(7, 1));
-        homebaseLabel = new JLabel(("Selamat datang di Homebase! " + player.getName()), JLabel.CENTER);
-        panel.revalidate();
-        panel.repaint();   
+        // Create the main panel with a layered layout
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(600, 350)); // Set preferred size for the layered pane
+    
+        // Load the background image
+        ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Background_homebase.png");
+        JLabel backgroundLabel = new JLabel(backgroundIcon);
+        backgroundLabel.setBounds(0, 0, backgroundIcon.getIconWidth(), backgroundIcon.getIconHeight());
+
+        ImageIcon buttonIcon = new ImageIcon("C:\\Users\\pinkg\\OneDrive\\Documents\\GitHub\\Palworld-2\\Button_wood_texture.png");
+    
+        // Create a panel for the buttons and other components
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setOpaque(false); // Make the panel transparent
+        panel.setBounds(0, 0, backgroundIcon.getIconWidth(), backgroundIcon.getIconHeight());
+    
+        // Homebase label
+        homebaseLabel = new JLabel("Selamat datang di Homebase! " + player.getName(), JLabel.CENTER);
+        homebaseLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        homebaseLabel.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 24));
+        homebaseLabel.setForeground(Color.ORANGE);
         panel.add(homebaseLabel);
+    
+        panel.add(Box.createRigidArea(new Dimension(0, 15))); // Add spacing
+    
+        // Heal Button
+        JPanel healPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        healPanel.setOpaque(false); // Make the panel transparent
         JButton healButton = new JButton("Heal Monster");
+        healButton.setPreferredSize(new Dimension(180, 30)); // Set button size
+        healButton.setIcon(buttonIcon);
+        healButton.setVerticalTextPosition(SwingConstants.CENTER);
+        healButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        healButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
+        healButton.setForeground(Color.WHITE);
         healButton.addActionListener(e -> {
             for (Monster monster : player.monsters) {
                 monster.Heal();
@@ -351,17 +438,27 @@ public class UI {
             updateMonsterList();
             JOptionPane.showMessageDialog(frame, "All monsters healed!");
         });
-        panel.add(healButton);
+        healPanel.add(healButton);
+        panel.add(healPanel);
     
+        // Evolve Button
+        JPanel evolvePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        evolvePanel.setOpaque(false); // Make the panel transparent
         JButton evolveButton = new JButton("Evolve Monster");
+        evolveButton.setIcon(buttonIcon);
+        evolveButton.setVerticalTextPosition(SwingConstants.CENTER);
+        evolveButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        evolveButton.setPreferredSize(new Dimension(180, 30)); // Set button size
+        evolveButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
+        evolveButton.setForeground(Color.WHITE);
         evolveButton.addActionListener(e -> {
             for (Monster monster : player.monsters) {
                 if (!monster.evolved) {
                     if (monster.getLevel() >= 10) {
-                        String newElement = JOptionPane.showInputDialog(frame, 
-                            "Enter new element for " + monster.getName() + ":\n" +
-                            "(API, ANGIN, AIR, ES, TANAH), element should be the most logical.");
-                        
+                        String newElement = JOptionPane.showInputDialog(frame,
+                                "Enter new element for " + monster.getName() + ":\n" +
+                                        "(API, ANGIN, AIR, ES, TANAH), element should be the most logical.");
+    
                         if (newElement != null) {
                             Monster evolvedMonster = monster.Evolve(newElement);
                             if (evolvedMonster != null) {
@@ -373,8 +470,7 @@ public class UI {
                                 JOptionPane.showMessageDialog(frame, "Evolution failed! Invalid element.");
                             }
                         }
-                    } 
-                    else {
+                    } else {
                         JOptionPane.showMessageDialog(frame, monster.getName() + " needs to be at least level 10 to evolve.");
                     }
                 } else {
@@ -382,50 +478,95 @@ public class UI {
                 }
             }
         });
-        
-        panel.add(evolveButton);
+        evolvePanel.add(evolveButton);
+        panel.add(evolvePanel);
     
+        // Buy Item Button
+        JPanel buyItemPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buyItemPanel.setOpaque(false); // Make the panel transparent
         JButton buyItemButton = new JButton("Beli Item");
+        buyItemButton.setIcon(buttonIcon);
+        buyItemButton.setVerticalTextPosition(SwingConstants.CENTER);
+        buyItemButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        buyItemButton.setPreferredSize(new Dimension(180, 30)); // Set button size
+        buyItemButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
+        buyItemButton.setForeground(Color.WHITE);
         buyItemButton.addActionListener(e -> {
             mainPanel.add(BuyPotion(), "BuyItem");
             cardLayout.show(mainPanel, "BuyItem");
-            
-        }); 
-        panel.add(buyItemButton);
+        });
+        buyItemPanel.add(buyItemButton);
+        panel.add(buyItemPanel);
     
-        
-
+        // Dungeon Button
+        JPanel dungeonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        dungeonPanel.setOpaque(false); // Make the panel transparent
         JButton dungeonButton = new JButton("Keluar Homebase");
+        dungeonButton.setIcon(buttonIcon);
+        dungeonButton.setVerticalTextPosition(SwingConstants.CENTER);
+        dungeonButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        dungeonButton.setPreferredSize(new Dimension(180, 30)); // Set button size
+        dungeonButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
+        dungeonButton.setForeground(Color.WHITE);
         dungeonButton.addActionListener(e -> chooseMonstersForDungeon());
-        panel.add(dungeonButton);
-        
+        dungeonPanel.add(dungeonButton);
+        panel.add(dungeonPanel);
     
+        // Manage Monsters Button
+        JPanel manageMonstersPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        manageMonstersPanel.setOpaque(false); // Make the panel transparent
         JButton manageMonstersButton = new JButton("Manage Monsters");
+        manageMonstersButton.setIcon(buttonIcon);
+        manageMonstersButton.setVerticalTextPosition(SwingConstants.CENTER);
+        manageMonstersButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        manageMonstersButton.setPreferredSize(new Dimension(180, 30)); // Set button size
         mainPanel.add(createManageMonstersPanel(), "ManageMonsters");
         manageMonstersButton.addActionListener(e -> cardLayout.show(mainPanel, "ManageMonsters"));
-        panel.add(manageMonstersButton);
+        manageMonstersButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
+        manageMonstersButton.setForeground(Color.WHITE);
+        manageMonstersPanel.add(manageMonstersButton);
+        panel.add(manageMonstersPanel);
+    
+        // Save Button
+        JPanel savePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        savePanel.setOpaque(false); // Make the panel transparent
+        saveButton = new JButton("Save Game");
+        saveButton.setIcon(buttonIcon);
+        saveButton.setVerticalTextPosition(SwingConstants.CENTER);
+        saveButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        saveButton.setFont(new Font("Sorts Mill Goudy", Font.BOLD, 16));
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setPreferredSize(new Dimension(180, 30)); // Set button size
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    GameState gameState = new GameState(player.getName(), player.getGold(), player.monsters, player.getPotions());
+                    SaveAndLoad.saveGame(gameState, player.getName());
+                    JOptionPane.showMessageDialog(frame, "Game saved successfully!");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(frame, "Failed to save the game!");
+                }
+            }
+        });
+        savePanel.add(saveButton);
+        panel.add(savePanel);
     
         updateHomebaseLabel(player.getName());
-        saveButton = new JButton("Save Game");
-        panel.add(saveButton);
-   
-    saveButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                GameState gameState = new GameState(player.getName(),player.getGold(), player.monsters, player.getPotions());
-                SaveAndLoad.saveGame(gameState, player.getName());
-                JOptionPane.showMessageDialog(frame, "Game saved successfully!");
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Failed to save the game!");
-            }
-        }
-    });
-        
-        return panel;
+    
+        // Add the components to the layered pane
+        layeredPane.add(backgroundLabel, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.add(panel, JLayeredPane.PALETTE_LAYER);
+    
+        // Create a new JPanel to add the layered pane and return it
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(layeredPane, BorderLayout.CENTER);
+    
+        return mainPanel;
     }
-
+    
+    
     private JPanel BuyPotion() {
         JPanel panel = new JPanel(new BorderLayout());
 
