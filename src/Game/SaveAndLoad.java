@@ -89,12 +89,14 @@ class GameState implements Serializable {
     
     public GameState(String playerName,int gold, List<Monster> monsters, List<Potion> potions){//Map<String, Monster> monsters, List<String> items) {
         this.playerName = playerName;
+        this.gold = gold;
         this.monsters = monsters;
         this.potions = potions;
     }
+    
     public GameState(){
     }
-    
+
     public String getPlayerName() {
         return this.playerName;
     }

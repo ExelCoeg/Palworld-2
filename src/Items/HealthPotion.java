@@ -8,11 +8,6 @@ public class HealthPotion extends Potion {
         return this.healAmount;
     }
 
-
-    public HealthPotion(int price) {
-        super(price);
-    }
-
     @Override
     public void useItem(Monster playerMonster) {
         playerMonster.setHp(playerMonster.getHp() + healAmount);
